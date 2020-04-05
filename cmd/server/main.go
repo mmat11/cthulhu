@@ -1,11 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -17,7 +14,7 @@ import (
 )
 
 const (
-	listenAddress = ":3000"
+	listenAddress = ":80"
 )
 
 var (
@@ -37,19 +34,16 @@ func main() {
 			*endpointSet,
 			logger,
 		)
-
-		errs = make(chan error)
 	)
 
 	level.Info(logger).Log("msg", "start")
-	defer level.Info(logger).Log("msg", "stop", "errs", <-errs)
+	defer level.Info(logger).Log("msg", "stop")
 
-	go func() {
-		c := make(chan os.Signal)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		errs <- fmt.Errorf("%s", <-c)
-	}()
-	go func() {
-		errs <- http.ListenAndServe(listenAddress, httpHandler)
-	}()
+	if err := http.ListenAndServe(listenAddress, httpHandler); err != nil {
+		level.Error(logger).Log(
+			"msg", "failed to start server",
+			"err", err,
+		)
+		os.Exit(1)
+	}
 }
