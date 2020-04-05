@@ -20,8 +20,7 @@ const (
 )
 
 var (
-	botToken       = bot.Token(os.Getenv("BOT_TOKEN"))
-	webhookAddress = os.Getenv("WEBHOOK_ADDRESS")
+	botToken = bot.Token(os.Getenv("BOT_TOKEN"))
 )
 
 func main() {
