@@ -1,11 +1,13 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"os"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"gopkg.in/yaml.v2"
 
 	"tg.bot/bot"
 	"tg.bot/cmd"
@@ -14,9 +16,13 @@ import (
 )
 
 const (
+	// server
 	listenAddress = ":443"
 	certFile      = "./bot.pem"
 	keyFile       = "./server.key"
+
+	// bot
+	configFile = "config.yaml"
 )
 
 var (
@@ -27,7 +33,8 @@ func main() {
 	var (
 		logger log.Logger = cmd.MakeLogger()
 
-		botService  *bot.Service  = bot.NewService(logger, botToken)
+		config      bot.Config    = readConfig(logger, configFile)
+		botService  *bot.Service  = bot.NewService(logger, config, botToken)
 		endpointSet *endpoint.Set = endpoint.NewSet(botService)
 
 		httpHandler http.Handler = transport.MakeHTTPHandler(
@@ -47,4 +54,27 @@ func main() {
 		)
 		os.Exit(1)
 	}
+}
+
+func readConfig(logger log.Logger, path string) bot.Config {
+	var cfg bot.Config
+
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		level.Error(logger).Log(
+			"msg", "failed to open config file",
+			"err", err,
+		)
+		os.Exit(1)
+	}
+
+	err = yaml.Unmarshal([]byte(data), &cfg)
+	if err != nil {
+		level.Error(logger).Log(
+			"msg", "config file data is invalid",
+			"err", err,
+		)
+		os.Exit(1)
+	}
+	return cfg
 }

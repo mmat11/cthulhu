@@ -1,0 +1,13 @@
+bot:
+  access_control:
+    admin:
+      ids:
+      - 131000337
+      permissions:
+      - "ban"
+      - "unban"
+    moderator:
+      ids:
+      - 1234
+      permissions:
+      - "unban"
