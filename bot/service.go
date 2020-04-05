@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 
 	"tg.bot/telegram"
 )
@@ -22,6 +23,7 @@ func NewService(logger log.Logger, token Token) *Service {
 	}
 }
 
-func (s *Service) Update(ctx context.Context, req *telegram.Update) error {
+func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error {
+	level.Info(s.Logger).Log("msg", "received update request", "username", updateReq.Message.From.UserName)
 	return nil
 }

@@ -1,9 +1,11 @@
 package endpoint
 
+import "net/http"
+
 type Response struct {
-	Code uint32
+	Status int
 }
 
 var (
-	OkResponse Response = Response{Code: 200}
+	OkResponse Response = Response{Status: http.StatusOK}
 )

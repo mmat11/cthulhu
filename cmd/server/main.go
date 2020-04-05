@@ -41,8 +41,8 @@ func main() {
 		errs = make(chan error)
 	)
 
-	level.Info(logger).Log("msg", "starting")
-	defer level.Info(logger).Log("msg", "stopped", "errs", <-errs)
+	level.Info(logger).Log("msg", "start")
+	defer level.Info(logger).Log("msg", "stop", "errs", <-errs)
 
 	go func() {
 		c := make(chan os.Signal)

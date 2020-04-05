@@ -2,11 +2,11 @@ package transport
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/go-kit/kit/transport"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -24,7 +24,9 @@ func MakeHTTPHandler(s bot.Service, e endpoint.Set, logger log.Logger) http.Hand
 		updatePath = fmt.Sprintf("%s/update", apiPrefixWithToken)
 	)
 
-	r.Methods("POST").Path(updatePath).Handler(httptransport.NewServer(
+	level.Info(logger).Log("msg", "add handler", "path", updatePath)
+
+	r.Methods(http.MethodPost).Path(updatePath).Handler(httptransport.NewServer(
 		e.Update,
 		decodeUpdateRequest,
 		encodeUpdateResponse,
@@ -35,11 +37,7 @@ func MakeHTTPHandler(s bot.Service, e endpoint.Set, logger log.Logger) http.Hand
 					if err == nil {
 						panic("endpoint error is nil")
 					}
-					w.Header().Set("Content-Type", "application/json; charset=utf-8")
-					w.WriteHeader(http.StatusInternalServerError)
-					json.NewEncoder(w).Encode(map[string]interface{}{
-						"error": err.Error(),
-					})
+					internalServerError(w, err.Error())
 				},
 			),
 		}...,
