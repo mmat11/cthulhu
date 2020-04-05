@@ -15,8 +15,8 @@ import (
 
 const (
 	listenAddress = ":443"
-	serverCRT     = "./server.crt"
-	serverKEY     = "./server.key"
+	certFile      = "./bot.pem"
+	keyFile       = "./server.key"
 )
 
 var (
@@ -41,7 +41,7 @@ func main() {
 	level.Info(logger).Log("msg", "start")
 	defer level.Info(logger).Log("msg", "stop")
 
-	if err := http.ListenAndServeTLS(listenAddress, serverCRT, serverKEY, httpHandler); err != nil {
+	if err := http.ListenAndServeTLS(listenAddress, certFile, keyFile, httpHandler); err != nil {
 		level.Error(logger).Log(
 			"msg", "failed to start server",
 			"err", err,
