@@ -14,7 +14,9 @@ import (
 )
 
 const (
-	listenAddress = ":80"
+	listenAddress = ":443"
+	serverCRT     = "./server.crt"
+	serverKEY     = "./server.key"
 )
 
 var (
@@ -39,7 +41,7 @@ func main() {
 	level.Info(logger).Log("msg", "start")
 	defer level.Info(logger).Log("msg", "stop")
 
-	if err := http.ListenAndServe(listenAddress, httpHandler); err != nil {
+	if err := http.ListenAndServeTLS(listenAddress, serverCRT, serverKEY, httpHandler); err != nil {
 		level.Error(logger).Log(
 			"msg", "failed to start server",
 			"err", err,
