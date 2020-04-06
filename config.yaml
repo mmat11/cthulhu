@@ -4,6 +4,8 @@ bot:
       - group:
           id: -1001150551096
           url: t.me/devopsitalia
+          crosspost_tags:
+            - devops
           admin:
             ids:
               - 131000337  # @mmat11
@@ -19,6 +21,9 @@ bot:
       - group:
           id: -1001476422781
           url: t.me/kubernetes_it
+          crosspost_tags:
+            - kubernetes
+            - k8s
           admin:
             ids:
               - 797091005  # @pr0metherion
@@ -28,6 +33,8 @@ bot:
       - group:
           id: -1001141557431
           url: t.me/golangita
+          crosspost_tags:
+            - golang
           admin:
             ids:
               - 40323575  # @lucacavallaro
@@ -37,6 +44,8 @@ bot:
       - group:
           id: -1001271237061
           url: t.me/kafkastreaming
+          crosspost_tags:
+            - kafka
           admin:
             ids:
               - 82046673  # @ugolandini
