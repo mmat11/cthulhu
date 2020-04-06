@@ -5,9 +5,9 @@ import (
 	"net/http"
 )
 
-func internalServerError(w http.ResponseWriter, errorMessage string) {
+func errorEncoder(w http.ResponseWriter, errorMessage string) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusInternalServerError)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"error": errorMessage,
 	})
