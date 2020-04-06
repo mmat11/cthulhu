@@ -37,7 +37,7 @@ func MakeHTTPHandler(s bot.Service, e endpoint.Set, logger log.Logger) http.Hand
 					if err == nil {
 						panic("endpoint error is nil")
 					}
-					internalServerError(w, err.Error())
+					errorEncoder(w, err.Error())
 				},
 			),
 		}...,
