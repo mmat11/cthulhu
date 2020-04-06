@@ -56,3 +56,13 @@ func KickChatMember(ctx context.Context, token string, chatID int64, userID int)
 	)
 	return doRequest(url, body)
 }
+
+func UnbanChatMember(ctx context.Context, token string, chatID int64, userID int) error {
+	// https://core.telegram.org/bots/api#unbanchatmember
+	const method = "unbanChatMember"
+	var (
+		url  string = buildURL(token, method)
+		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","user_id":"%v"}`, chatID, userID))
+	)
+	return doRequest(url, body)
+}
