@@ -34,3 +34,12 @@ bot:
             permissions:
               - ban
               - unban
+      - group:
+          id: -1001271237061
+          url: t.me/kafkastreaming
+          admin:
+            ids:
+              - 82046673  # @ugolandini
+            permissions:
+              - ban
+              - unban
