@@ -42,7 +42,7 @@ func SendMessage(ctx context.Context, token string, chatID int64, text string) e
 	const method = "sendMessage"
 	var (
 		url  string = buildURL(token, method)
-		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","text":"%v"}`, chatID, text))
+		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","text":"%v","disable_web_page_preview":"true"}`, chatID, text))
 	)
 	return doRequest(url, body)
 }
