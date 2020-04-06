@@ -15,7 +15,8 @@ func (s *Service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 	if entities := updateReq.Message.Entities; entities != nil {
 		for _, entity := range *entities {
 			if entity.IsHashtag() {
-				hashTags[updateReq.Message.Text[entity.Offset:entity.Length]] = struct{}{}
+				offset := entity.Offset
+				hashTags[updateReq.Message.Text[offset+1:offset+entity.Length]] = struct{}{}
 			}
 		}
 	}
