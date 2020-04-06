@@ -28,6 +28,11 @@ func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		return nil
 	}
 
+	if !s.checkOrigin(ctx, updateReq) {
+		level.Error(s.Logger).Log("msg", "group is not part of the network")
+		return nil
+	}
+
 	if command := updateReq.Message.Command(); command != "" {
 		level.Info(s.Logger).Log("msg", "received new command", "command", command)
 		switch command {
@@ -39,4 +44,15 @@ func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error 
 	}
 
 	return s.handleCrossposts(ctx, updateReq)
+}
+
+func (s *Service) checkOrigin(ctx context.Context, updateReq *telegram.Update) bool {
+	var originID int64 = updateReq.Message.Chat.ID
+
+	for _, g := range s.Config.Bot.AccessControl.Groups {
+		if g.Group.ID == originID {
+			return true
+		}
+	}
+	return false
 }
