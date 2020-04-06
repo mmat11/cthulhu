@@ -2,13 +2,14 @@ package bot
 
 import (
 	"context"
+	"fmt"
 
 	"tg.bot/telegram"
 )
 
 func (s *Service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
 	var (
-		text     string              = updateReq.Message.Text
+		text     string              = fmt.Sprintf("from: t.me/%s // %s", updateReq.Message.Chat.UserName, updateReq.Message.Text)
 		hashTags map[string]struct{} = make(map[string]struct{}, 0)
 	)
 
