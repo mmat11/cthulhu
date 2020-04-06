@@ -9,8 +9,7 @@ import (
 
 func (s *Service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
 	var (
-		header   string              = fmt.Sprintf("from: %s //", updateReq.Message.Chat.UserName)
-		text     string              = header + updateReq.Message.Text
+		text     string              = fmt.Sprintf("from: t.me/%s // %s", updateReq.Message.Chat.UserName, updateReq.Message.Text)
 		hashTags map[string]struct{} = make(map[string]struct{}, 0)
 	)
 
