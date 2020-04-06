@@ -28,17 +28,15 @@ func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		return nil
 	}
 
-	command := updateReq.Message.Command()
-	if command == "" {
-		return nil
+	if command := updateReq.Message.Command(); command != "" {
+		level.Info(s.Logger).Log("msg", "received new command", "command", command)
+		switch command {
+		case banCommand:
+			return s.handleBan(ctx, updateReq)
+		case unbanCommand:
+			return s.handleUnban(ctx, updateReq)
+		}
 	}
 
-	level.Info(s.Logger).Log("msg", "received new command", "command", command)
-	switch command {
-	case banCommand:
-		return s.handleBan(ctx, updateReq)
-	case unbanCommand:
-		return s.handleUnban(ctx, updateReq)
-	}
-	return nil
+	return s.handleCrossposts(ctx, updateReq)
 }
