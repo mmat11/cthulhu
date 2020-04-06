@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -24,6 +25,10 @@ func NewService(logger log.Logger, config Config, token Token) *Service {
 }
 
 func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error {
+	if updateReq.Message == nil {
+		return nil
+	}
+
 	command := updateReq.Message.Command()
 	if command == "" {
 		return nil
@@ -50,11 +55,15 @@ func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error 
 			"user_id", userID,
 		)
 
-		if !s.Config.CheckAdminPermissions(authorID, command) {
+		if !s.Config.CheckAdminPermissions(chatID, authorID, command) {
 			level.Info(s.Logger).Log("msg", "not enough privileges")
 			return nil
 		}
-		return telegram.KickChatMember(ctx, string(s.Token), chatID, userID)
+		if err := telegram.KickChatMember(ctx, string(s.Token), chatID, userID); err != nil {
+			return err
+		}
+		telegram.SendMessage(ctx, string(s.Token), chatID, fmt.Sprintf("user %s banned", updateReq.Message.ReplyToMessage.From.UserName))
+		return nil
 	}
 	return nil
 }

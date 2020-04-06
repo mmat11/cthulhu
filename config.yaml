@@ -1,13 +1,36 @@
 bot:
   access_control:
-    admin:
-      ids:
-      - 131000337
-      permissions:
-      - "ban"
-      - "unban"
-    moderator:
-      ids:
-      - 1234
-      permissions:
-      - "unban"
+    groups:
+      - group:
+          id: -1001150551096
+          url: t.me/devopsitalia
+          admin:
+            ids:
+              - 131000337  # @mmat11
+              - 43120899   # @mirioo
+            permissions:
+              - ban
+              - unban
+          #moderator:
+          #  ids:
+          #    - 1234
+          #  permissions:
+          #    - unban
+      - group:
+          id: -1001476422781
+          url: t.me/kubernetes_it
+          admin:
+            ids:
+              - 797091005  # @pr0metherion
+            permissions:
+              - ban
+              - unban
+      - group:
+          id: 1 #todo
+          url: t.me/golangita
+          admin:
+            ids:
+              - 40323575  # @lucacavallaro
+            permissions:
+              - ban
+              - unban

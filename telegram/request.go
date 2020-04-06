@@ -15,17 +15,10 @@ func buildURL(token string, method string) string {
 	return fmt.Sprintf("%s/bot%s/%s", apiURL, token, method)
 }
 
-func KickChatMember(ctx context.Context, token string, chatID int64, userID int) error {
-	// https://core.telegram.org/bots/api#kickchatmember
-	const method = "kickChatMember"
+func doRequest(url string, reqBody []byte) error {
+	var tgResp APIResponse
 
-	var (
-		tgResp APIResponse
-		url    string = buildURL(token, method)
-	)
-
-	var jsonStr = []byte(fmt.Sprintf(`{"chat_id":"%v","user_id":"%v"}`, chatID, userID))
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -42,4 +35,24 @@ func KickChatMember(ctx context.Context, token string, chatID int64, userID int)
 		return fmt.Errorf("api error: %s, code: %v", tgResp.Description, tgResp.ErrorCode)
 	}
 	return nil
+}
+
+func SendMessage(ctx context.Context, token string, chatID int64, text string) error {
+	// https://core.telegram.org/bots/api#sendmessage
+	const method = "sendMessage"
+	var (
+		url  string = buildURL(token, method)
+		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","text":"%v"}`, chatID, text))
+	)
+	return doRequest(url, body)
+}
+
+func KickChatMember(ctx context.Context, token string, chatID int64, userID int) error {
+	// https://core.telegram.org/bots/api#kickchatmember
+	const method = "kickChatMember"
+	var (
+		url  string = buildURL(token, method)
+		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","user_id":"%v"}`, chatID, userID))
+	)
+	return doRequest(url, body)
 }
