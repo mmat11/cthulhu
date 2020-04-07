@@ -22,7 +22,7 @@ func (s *Service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		text += fmt.Sprintf(" %s", updateReq.Message.ReplyToMessage.Text)
 	}
 
-	if !s.Config.isModerator(originID, authorID) || !s.Config.isAdmin(originID, authorID) {
+	if !s.Config.isModerator(originID, authorID) && !s.Config.isAdmin(originID, authorID) {
 		return nil
 	}
 
