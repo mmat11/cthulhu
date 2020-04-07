@@ -21,6 +21,7 @@ bot:
       - group:
           id: -1001476422781
           url: t.me/kubernetes_it
+          welcome_message: "👋 e benvenuto, cosa fai di bello con k8s?"
           crosspost_tags:
             - kubernetes
             - k8s

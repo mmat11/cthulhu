@@ -33,6 +33,10 @@ func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		return nil
 	}
 
+	if updateReq.Message.NewChatMembers != nil {
+		s.handleNewUsers(ctx, updateReq)
+	}
+
 	if command := updateReq.Message.Command(); command != "" {
 		level.Info(s.Logger).Log("msg", "received new command", "command", command)
 		switch command {
@@ -55,4 +59,18 @@ func (s *Service) checkOrigin(ctx context.Context, updateReq *telegram.Update) b
 		}
 	}
 	return false
+}
+
+func (s *Service) handleNewUsers(ctx context.Context, updateReq *telegram.Update) {
+	var originID int64 = updateReq.Message.Chat.ID
+
+	for _, g := range s.Config.Bot.AccessControl.Groups {
+		if g.Group.ID == originID {
+			if g.Group.WelcomeMessage != "" {
+				for range *updateReq.Message.NewChatMembers {
+					telegram.Reply(ctx, string(s.Token), g.Group.ID, g.Group.WelcomeMessage, updateReq.Message.MessageID)
+				}
+			}
+		}
+	}
 }

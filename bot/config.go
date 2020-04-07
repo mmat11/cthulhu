@@ -7,10 +7,11 @@ type Config struct {
 		AccessControl struct {
 			Groups []struct {
 				Group struct {
-					ID            int64    `yaml:"id"`
-					URL           string   `yaml:"url"`
-					CrossPostTags []string `yaml:"crosspost_tags"`
-					Admin         struct {
+					ID             int64    `yaml:"id"`
+					URL            string   `yaml:"url"`
+					WelcomeMessage string   `yaml:"welcome_message"`
+					CrossPostTags  []string `yaml:"crosspost_tags"`
+					Admin          struct {
 						IDs         []int    `yaml:"ids"`
 						Permissions []string `yaml:"permissions"`
 					} `yaml:"admin"`
