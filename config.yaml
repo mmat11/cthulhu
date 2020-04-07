@@ -13,11 +13,11 @@ bot:
             permissions:
               - ban
               - unban
-          #moderator:
-          #  ids:
-          #    - 1234
-          #  permissions:
-          #    - unban
+          moderator:
+            ids:
+              - 797091005  # @pr0metherion
+              - 40323575   # @lucacavallaro
+              - 82046673   # @ugolandini
       - group:
           id: -1001476422781
           url: t.me/kubernetes_it
@@ -30,6 +30,12 @@ bot:
             permissions:
               - ban
               - unban
+          moderator:
+            ids:
+              - 131000337  # @mmat11
+              - 43120899   # @mirioo
+              - 40323575   # @lucacavallaro
+              - 82046673   # @ugolandini
       - group:
           id: -1001141557431
           url: t.me/golangita
@@ -42,6 +48,12 @@ bot:
             permissions:
               - ban
               - unban
+          moderator:
+            ids:
+              - 131000337  # @mmat11
+              - 43120899   # @mirioo
+              - 797091005  # @pr0metherion
+              - 82046673   # @ugolandini
       - group:
           id: -1001271237061
           url: t.me/kafkastreaming
@@ -53,3 +65,9 @@ bot:
             permissions:
               - ban
               - unban
+          moderator:
+            ids:
+              - 131000337  # @mmat11
+              - 43120899   # @mirioo
+              - 797091005  # @pr0metherion
+              - 40323575   # @lucacavallaro

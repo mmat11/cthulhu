@@ -10,10 +10,21 @@ import (
 
 func (s *Service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
 	var (
-		text     string              = fmt.Sprintf("from: t.me/%s // %s", updateReq.Message.Chat.UserName, updateReq.Message.Text)
 		hashTags map[string]struct{} = make(map[string]struct{}, 0)
 		originID int64               = updateReq.Message.Chat.ID
+		authorID int                 = updateReq.Message.From.ID
+		text     string              = fmt.Sprintf("@%s >", updateReq.Message.Chat.UserName)
 	)
+
+	if updateReq.Message.ReplyToMessage == nil {
+		text += fmt.Sprintf(" %s", updateReq.Message.Text)
+	} else {
+		text += fmt.Sprintf(" %s", updateReq.Message.ReplyToMessage.Text)
+	}
+
+	if !s.Config.isModerator(originID, authorID) || !s.Config.isAdmin(originID, authorID) {
+		return nil
+	}
 
 	if entities := updateReq.Message.Entities; entities != nil {
 		for _, entity := range *entities {
