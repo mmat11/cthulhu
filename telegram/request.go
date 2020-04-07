@@ -47,6 +47,16 @@ func SendMessage(ctx context.Context, token string, chatID int64, text string) e
 	return doRequest(url, body)
 }
 
+func Reply(ctx context.Context, token string, chatID int64, text string, messageID int) error {
+	// https://core.telegram.org/bots/api#sendmessage
+	const method = "sendMessage"
+	var (
+		url  string = buildURL(token, method)
+		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","text":"%v","reply_to_message_id":"%v","disable_web_page_preview":"true"}`, chatID, text, messageID))
+	)
+	return doRequest(url, body)
+}
+
 func KickChatMember(ctx context.Context, token string, chatID int64, userID int) error {
 	// https://core.telegram.org/bots/api#kickchatmember
 	const method = "kickChatMember"
