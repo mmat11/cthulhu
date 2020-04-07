@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"unicode/utf16"
 
+	"github.com/go-kit/kit/log/level"
 	"tg.bot/telegram"
 )
 
@@ -42,6 +43,7 @@ func (s *Service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		for _, hashTag := range g.Group.CrossPostTags {
 			if _, ok := hashTags[hashTag]; ok {
 				if g.Group.ID != originID {
+					level.Info(s.Logger).Log("msg", "crossposting", "text", text, "to", g.Group.ID)
 					telegram.SendMessage(ctx, string(s.Token), g.Group.ID, text)
 				}
 			}
