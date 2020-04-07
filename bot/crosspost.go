@@ -26,8 +26,6 @@ func (s *Service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		}
 	}
 
-	fmt.Println(hashTags)
-
 	for _, g := range s.Config.Bot.AccessControl.Groups {
 		for _, hashTag := range g.Group.CrossPostTags {
 			if _, ok := hashTags[hashTag]; ok {
