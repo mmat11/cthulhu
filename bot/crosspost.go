@@ -11,7 +11,7 @@ import (
 
 func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
 	var (
-		hashTags map[string]struct{} = make(map[string]struct{}, 0)
+		hashTags map[string]struct{} = make(map[string]struct{})
 		originID int64               = updateReq.Message.Chat.ID
 		authorID int                 = updateReq.Message.From.ID
 		text     string              = fmt.Sprintf("@%s >", updateReq.Message.Chat.UserName)
