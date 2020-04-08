@@ -9,7 +9,7 @@ import (
 	"tg.bot/telegram"
 )
 
-func (s *Service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
+func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
 	var (
 		hashTags map[string]struct{} = make(map[string]struct{}, 0)
 		originID int64               = updateReq.Message.Chat.ID

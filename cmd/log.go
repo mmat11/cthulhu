@@ -13,6 +13,5 @@ func MakeLogger() log.Logger {
 	logger = level.NewFilter(logger, level.AllowInfo())
 	logger = level.NewInjector(logger, level.InfoValue())
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
-
 	return logger
 }

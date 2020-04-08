@@ -20,7 +20,7 @@ func decodeUpdateRequest(_ context.Context, r *http.Request) (interface{}, error
 	var updateReq telegram.Update
 
 	if err := json.Unmarshal(body, &updateReq); err != nil {
-		return nil, errors.New("failed unmarshaling request")
+		return nil, err
 	}
 	return &updateReq, nil
 }

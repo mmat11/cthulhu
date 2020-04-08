@@ -9,21 +9,30 @@ import (
 	"tg.bot/telegram"
 )
 
-type Service struct {
+type Service interface {
+	Update(ctx context.Context, req *telegram.Update) error
+	GetToken() Token
+}
+
+type service struct {
 	Logger log.Logger
 	Token  Token
 	Config Config
 }
 
-func NewService(logger log.Logger, config Config, token Token) *Service {
-	return &Service{
+func NewService(logger log.Logger, config Config, token Token) *service {
+	return &service{
 		Logger: logger,
 		Token:  token,
 		Config: config,
 	}
 }
 
-func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error {
+func (s *service) GetToken() Token {
+	return s.Token
+}
+
+func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error {
 	if updateReq.Message == nil {
 		return nil
 	}
@@ -50,7 +59,7 @@ func (s *Service) Update(ctx context.Context, updateReq *telegram.Update) error 
 	return s.handleCrossposts(ctx, updateReq)
 }
 
-func (s *Service) checkOrigin(ctx context.Context, updateReq *telegram.Update) bool {
+func (s *service) checkOrigin(ctx context.Context, updateReq *telegram.Update) bool {
 	var originID int64 = updateReq.Message.Chat.ID
 
 	for _, g := range s.Config.Bot.AccessControl.Groups {
@@ -61,7 +70,7 @@ func (s *Service) checkOrigin(ctx context.Context, updateReq *telegram.Update) b
 	return false
 }
 
-func (s *Service) handleNewUsers(ctx context.Context, updateReq *telegram.Update) {
+func (s *service) handleNewUsers(ctx context.Context, updateReq *telegram.Update) {
 	var originID int64 = updateReq.Message.Chat.ID
 
 	for _, g := range s.Config.Bot.AccessControl.Groups {
