@@ -9,10 +9,10 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"gopkg.in/yaml.v2"
 
-	"tg.bot/bot"
-	"tg.bot/cmd"
-	"tg.bot/endpoint"
-	"tg.bot/transport"
+	"cthulhu/bot"
+	"cthulhu/cmd"
+	"cthulhu/endpoint"
+	"cthulhu/transport"
 )
 
 const (

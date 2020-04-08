@@ -8,8 +8,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/go-cmp/cmp"
 
-	"tg.bot/mock"
-	"tg.bot/telegram"
+	"cthulhu/mock"
+	"cthulhu/telegram"
 )
 
 func TestMakeUpdateEndpointOk(t *testing.T) {

@@ -3,7 +3,7 @@ package endpoint
 import (
 	"github.com/go-kit/kit/endpoint"
 
-	"tg.bot/bot"
+	"cthulhu/bot"
 )
 
 type Set struct {

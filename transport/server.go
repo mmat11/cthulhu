@@ -11,8 +11,8 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 
-	"tg.bot/bot"
-	"tg.bot/endpoint"
+	"cthulhu/bot"
+	"cthulhu/endpoint"
 )
 
 func MakeHTTPHandler(s bot.Service, e endpoint.Set, logger log.Logger) http.Handler {

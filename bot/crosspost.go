@@ -6,7 +6,7 @@ import (
 	"unicode/utf16"
 
 	"github.com/go-kit/kit/log/level"
-	"tg.bot/telegram"
+	"cthulhu/telegram"
 )
 
 func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
