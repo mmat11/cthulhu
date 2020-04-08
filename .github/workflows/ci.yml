@@ -1,6 +1,6 @@
 name: Cthulhu CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -17,9 +17,8 @@ jobs:
     - name: Lint
       run: |
         go get golang.org/x/tools/cmd/goimports
+        export PATH=$PATH:$GOPATH/bin
         go vet ./...
         diff -u <(echo -n) <(find . -name '*.go' | grep -v -E '^\./(mock)/' | xargs goimports -d)
     - name: Unit
-      run: |
-        go get -v -insecure ./...
-        go test -cover -short ./...
+      run: go test -cover ./...
