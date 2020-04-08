@@ -11,7 +11,7 @@ import (
 
 const banCommand = "ban"
 
-func (s *Service) handleBan(ctx context.Context, updateReq *telegram.Update) error {
+func (s *service) handleBan(ctx context.Context, updateReq *telegram.Update) error {
 	if updateReq.Message.ReplyToMessage == nil {
 		level.Info(s.Logger).Log("msg", "no message quoted")
 		return nil

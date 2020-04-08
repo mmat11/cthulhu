@@ -5,10 +5,11 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 
+	"tg.bot/bot"
 	"tg.bot/telegram"
 )
 
-func MakeUpdateEndpoint(s BotService) endpoint.Endpoint {
+func MakeUpdateEndpoint(s bot.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(*telegram.Update)
 		err := s.Update(ctx, req)

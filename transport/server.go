@@ -19,7 +19,7 @@ func MakeHTTPHandler(s bot.Service, e endpoint.Set, logger log.Logger) http.Hand
 	var (
 		r                  = mux.NewRouter()
 		apiPrefix          = "/v1"
-		apiPrefixWithToken = fmt.Sprintf("%s/%s", apiPrefix, s.Token)
+		apiPrefixWithToken = fmt.Sprintf("%s/%s", apiPrefix, s.GetToken())
 
 		updatePath = fmt.Sprintf("%s/update", apiPrefixWithToken)
 	)

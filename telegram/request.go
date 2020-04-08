@@ -19,6 +19,9 @@ func doRequest(url string, reqBody []byte) error {
 	var tgResp APIResponse
 
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return err
+	}
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

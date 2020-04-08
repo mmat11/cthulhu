@@ -1,0 +1,26 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.13, 1.14]
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup go ${{ matrix.go-version }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Lint
+      run: |
+        export PATH=${PATH}:`go env GOPATH`/bin
+        go get -u golang.org/x/tools/cmd/goimports
+        go get -u honnef.co/go/tools/cmd/staticcheck
+        go vet ./...
+        staticcheck ./...
+        diff -u <(echo -n) <(find . -name '*.go' | grep -v -E '^\./(mock)/' | xargs goimports -d)
+    - name: Unit
+      run: go test -cover ./...

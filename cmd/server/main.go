@@ -34,11 +34,11 @@ func main() {
 		logger log.Logger = cmd.MakeLogger()
 
 		config      bot.Config    = readConfig(logger, configFile)
-		botService  *bot.Service  = bot.NewService(logger, config, botToken)
+		botService  bot.Service   = bot.NewService(logger, config, botToken)
 		endpointSet *endpoint.Set = endpoint.NewSet(botService)
 
 		httpHandler http.Handler = transport.MakeHTTPHandler(
-			*botService,
+			botService,
 			*endpointSet,
 			logger,
 		)
