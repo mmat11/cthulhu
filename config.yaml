@@ -58,6 +58,7 @@ bot:
       - group:
           id: -1001271237061
           url: t.me/kafkastreaming
+          welcome_message: "👋 e benvenuto, cosa fai di bello con kafka/nats/pulsar/streaming vari?"
           crosspost_tags:
             - kafka
           admin:
