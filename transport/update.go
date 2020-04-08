@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"tg.bot/endpoint"
-	"tg.bot/telegram"
+	"cthulhu/endpoint"
+	"cthulhu/telegram"
 )
 
 func decodeUpdateRequest(_ context.Context, r *http.Request) (interface{}, error) {

@@ -6,7 +6,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
-	"tg.bot/telegram"
+	"cthulhu/telegram"
 )
 
 type Service interface {

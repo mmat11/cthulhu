@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-kit/kit/log/level"
 
-	"tg.bot/telegram"
+	"cthulhu/telegram"
 )
 
 const unbanCommand = "unban"

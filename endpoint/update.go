@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 
-	"tg.bot/bot"
-	"tg.bot/telegram"
+	"cthulhu/bot"
+	"cthulhu/telegram"
 )
 
 func MakeUpdateEndpoint(s bot.Service) endpoint.Endpoint {

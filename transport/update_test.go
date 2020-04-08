@@ -10,8 +10,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"tg.bot/endpoint"
-	"tg.bot/telegram"
+	"cthulhu/endpoint"
+	"cthulhu/telegram"
 )
 
 func TestDecodeUpdateRequest(t *testing.T) {

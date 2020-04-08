@@ -1,4 +1,4 @@
-module tg.bot
+module cthulhu
 
 go 1.14
 
