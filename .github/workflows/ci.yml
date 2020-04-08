@@ -1,4 +1,4 @@
-name: Cthulhu CI
+name: CI
 
 on: [push, pull_request]
 
@@ -17,13 +17,10 @@ jobs:
     - name: Lint
       run: |
         export PATH=${PATH}:`go env GOPATH`/bin
-        go get golang.org/x/tools/cmd/goimports
-        go vet ./...
-        diff -u <(echo -n) <(find . -name '*.go' | grep -v -E '^\./(mock)/' | xargs goimports -d)
-    - name: Staticcheck
-      run: |
-        export PATH=${PATH}:`go env GOPATH`/bin
+        go get -u golang.org/x/tools/cmd/goimports
         go get -u honnef.co/go/tools/cmd/staticcheck
+        go vet ./...
         staticcheck ./...
+        diff -u <(echo -n) <(find . -name '*.go' | grep -v -E '^\./(mock)/' | xargs goimports -d)
     - name: Unit
       run: go test -cover ./...
