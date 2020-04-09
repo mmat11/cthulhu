@@ -30,7 +30,7 @@ func (s *service) handleBan(ctx context.Context, updateReq *telegram.Update) err
 		"user_id", userID,
 	)
 
-	if !s.Config.CheckAdminPermissions(chatID, authorID, banCommand) {
+	if !s.Config.hasPermissions(chatID, authorID, banCommand) {
 		level.Info(s.Logger).Log("msg", "not enough privileges")
 		return nil
 	}

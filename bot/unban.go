@@ -30,7 +30,7 @@ func (s *service) handleUnban(ctx context.Context, updateReq *telegram.Update) e
 		"user_id", userID,
 	)
 
-	if !s.Config.CheckAdminPermissions(chatID, authorID, unbanCommand) {
+	if !s.Config.hasPermissions(chatID, authorID, unbanCommand) {
 		level.Info(s.Logger).Log("msg", "not enough privileges")
 		return nil
 	}

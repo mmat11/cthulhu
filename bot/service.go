@@ -9,6 +9,8 @@ import (
 	"cthulhu/telegram"
 )
 
+const pingCommand = "ping"
+
 type Service interface {
 	Update(ctx context.Context, req *telegram.Update) error
 	GetToken() Token
@@ -49,10 +51,14 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 	if command := updateReq.Message.Command(); command != "" {
 		level.Info(s.Logger).Log("msg", "received new command", "command", command)
 		switch command {
+		case pingCommand:
+			return telegram.SendMessage(ctx, string(s.Token), updateReq.Message.Chat.ID, "pong")
 		case banCommand:
 			return s.handleBan(ctx, updateReq)
 		case unbanCommand:
 			return s.handleUnban(ctx, updateReq)
+		case broadcastCommand:
+			return s.handleBroadcast(ctx, updateReq)
 		}
 	}
 
