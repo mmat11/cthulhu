@@ -22,7 +22,6 @@ bot:
       - group:
           id: -1001476422781
           url: t.me/kubernetes_it
-          welcome_message: "👋 e benvenuto, cosa fai di bello con k8s?"
           crosspost_tags:
             - kubernetes
             - k8s
@@ -39,6 +38,10 @@ bot:
               - 43120899   # @mirioo
               - 40323575   # @lucacavallaro
               - 82046673   # @ugolandini
+          tasks:
+            - task:
+                name: "welcome-new-members"
+                cron: ""
       - group:
           id: -1001141557431
           url: t.me/golangita

@@ -6,10 +6,10 @@ package mock
 
 import (
 	context "context"
-	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 	bot "cthulhu/bot"
 	telegram "cthulhu/telegram"
+	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // BotService is a mock of Service interface
