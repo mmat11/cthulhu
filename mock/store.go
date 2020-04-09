@@ -6,6 +6,7 @@ package mock
 
 import (
 	context "context"
+	telegram "cthulhu/telegram"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -34,7 +35,7 @@ func (m *StoreService) EXPECT() *StoreServiceMockRecorder {
 }
 
 // Create mocks base method
-func (m *StoreService) Create(arg0 context.Context, arg1 string, arg2 interface{}) error {
+func (m *StoreService) Create(arg0 context.Context, arg1 string, arg2 *telegram.Update) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
@@ -48,10 +49,10 @@ func (mr *StoreServiceMockRecorder) Create(arg0, arg1, arg2 interface{}) *gomock
 }
 
 // Delete mocks base method
-func (m *StoreService) Delete(arg0 context.Context, arg1 string) (interface{}, error) {
+func (m *StoreService) Delete(arg0 context.Context, arg1 string) (*telegram.Update, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
-	ret0, _ := ret[0].(interface{})
+	ret0, _ := ret[0].(*telegram.Update)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -63,10 +64,10 @@ func (mr *StoreServiceMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call 
 }
 
 // Read mocks base method
-func (m *StoreService) Read(arg0 context.Context, arg1 string) (interface{}, error) {
+func (m *StoreService) Read(arg0 context.Context, arg1 string) (*telegram.Update, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read", arg0, arg1)
-	ret0, _ := ret[0].(interface{})
+	ret0, _ := ret[0].(*telegram.Update)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -78,7 +79,7 @@ func (mr *StoreServiceMockRecorder) Read(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // Update mocks base method
-func (m *StoreService) Update(arg0 context.Context, arg1 string, arg2 interface{}) error {
+func (m *StoreService) Update(arg0 context.Context, arg1 string, arg2 *telegram.Update) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)

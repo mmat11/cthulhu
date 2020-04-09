@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cthulhu/mock"
+	"cthulhu/telegram"
 )
 
 func TestCreateOk(t *testing.T) {
@@ -17,7 +18,11 @@ func TestCreateOk(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = struct{}{}
+		val = &telegram.Update{
+			Message: &telegram.Message{
+				Text: "test",
+			},
+		}
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -38,7 +43,11 @@ func TestCreateAlreadyExists(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = struct{}{}
+		val = &telegram.Update{
+			Message: &telegram.Message{
+				Text: "test",
+			},
+		}
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -68,7 +77,11 @@ func TestReadOk(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = struct{}{}
+		val = &telegram.Update{
+			Message: &telegram.Message{
+				Text: "test",
+			},
+		}
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -120,10 +133,18 @@ func TestUpdateOk(t *testing.T) {
 	defer ctrl.Finish()
 
 	var (
-		ctx    = context.Background()
-		key    = "test"
-		val    = struct{}{}
-		newVal = "new"
+		ctx = context.Background()
+		key = "test"
+		val = &telegram.Update{
+			Message: &telegram.Message{
+				Text: "test",
+			},
+		}
+		newVal = &telegram.Update{
+			Message: &telegram.Message{
+				Text: "new",
+			},
+		}
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -163,7 +184,11 @@ func TestUpdateNotFound(t *testing.T) {
 	var (
 		ctx    = context.Background()
 		key    = "test"
-		newVal = "new"
+		newVal = &telegram.Update{
+			Message: &telegram.Message{
+				Text: "new",
+			},
+		}
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -184,7 +209,11 @@ func TestDeleteOk(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = struct{}{}
+		val = &telegram.Update{
+			Message: &telegram.Message{
+				Text: "test",
+			},
+		}
 	)
 
 	svc := mock.NewStoreService(ctrl)
