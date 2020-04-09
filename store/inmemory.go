@@ -12,7 +12,7 @@ type service struct {
 	mu sync.Mutex
 }
 
-func NewInMemoryKVStore() *service {
+func NewInMemory() *service {
 	return &service{KV: make(map[string]*telegram.Update)}
 }
 

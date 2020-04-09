@@ -6,6 +6,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
+	"cthulhu/store"
 	"cthulhu/telegram"
 )
 
@@ -20,6 +21,7 @@ type service struct {
 	Logger log.Logger
 	Token  Token
 	Config Config
+	Store  store.Service
 }
 
 func NewService(logger log.Logger, config Config, token Token) *service {
@@ -27,6 +29,7 @@ func NewService(logger log.Logger, config Config, token Token) *service {
 		Logger: logger,
 		Token:  token,
 		Config: config,
+		Store:  store.NewInMemory(),
 	}
 }
 
@@ -35,6 +38,8 @@ func (s *service) GetToken() Token {
 }
 
 func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error {
+	s.Store.Create(ctx, string(updateReq.UpdateID), updateReq)
+
 	if updateReq.Message == nil {
 		return nil
 	}
@@ -61,7 +66,6 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 			return s.handleBroadcast(ctx, updateReq)
 		}
 	}
-
 	return s.handleCrossposts(ctx, updateReq)
 }
 
