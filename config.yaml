@@ -13,6 +13,7 @@ bot:
             permissions:
               - ban
               - unban
+              - broadcast
           moderator:
             ids:
               - 797091005  # @pr0metherion
@@ -31,6 +32,7 @@ bot:
             permissions:
               - ban
               - unban
+              - broadcast
           moderator:
             ids:
               - 131000337  # @mmat11
@@ -49,6 +51,7 @@ bot:
             permissions:
               - ban
               - unban
+              - broadcast
           moderator:
             ids:
               - 131000337  # @mmat11
@@ -67,6 +70,7 @@ bot:
             permissions:
               - ban
               - unban
+              - broadcast
           moderator:
             ids:
               - 131000337  # @mmat11

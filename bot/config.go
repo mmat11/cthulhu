@@ -25,7 +25,7 @@ type Config struct {
 	} `yaml:"bot"`
 }
 
-func (c *Config) CheckAdminPermissions(chatID int64, userID int, operation string) bool {
+func (c *Config) hasPermissions(chatID int64, userID int, operation string) bool {
 	var (
 		userIDFound    = false
 		operationFound = false

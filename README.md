@@ -17,17 +17,25 @@ Available commands/functions:
 
     for these two commands to work, a message with the ban target has to be quoted.
 
-2.  Welcome message (optional), configurable via the `welcome_message` key in the config.yml.
+2.  Welcome message, configurable via `welcome_message` key in config.yml.
 
-3.  Community crossposts (optional), configurable via the `crosspost_tags` key in the config.yml:
+3.  Community crossposts, configurable via `crosspost_tags` key in config.yml:
 
     ```
-    #tag
+    #tag message
     ```
 
-    Cthulhu will forward the message in all the groups in which `#tag` is in `crosspost_tags`.
+    Cthulhu will forward _message_ in all the groups in which `#tag` is part of `crosspost_tags`.
 
-4.  Admin/mod permissions with commands, configurable per group in the config.yml.
+4.  Admin/mod permissions with commands, configurable per group in config.yml.
+
+5.  Broadcast:
+
+    ```
+    /broadcast message
+    ```
+
+    _message_ will be sent in all groups except the current one.
 
 ## Contributing
 
