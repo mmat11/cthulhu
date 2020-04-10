@@ -86,7 +86,7 @@ bot:
               value: 86400  # 24h
     - task:
         name: WelcomeMessage
-        cron: '@every 10s' #'05 8,12,16,20 * * *'
+        cron: '05 8,12,16,20 * * *'
         args:
           - arg:
               name: kubernetesITCfg
