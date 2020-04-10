@@ -34,9 +34,9 @@ func (s *service) handleBan(ctx context.Context, updateReq *telegram.Update) err
 		level.Info(s.Logger).Log("msg", "not enough privileges")
 		return nil
 	}
-	if err := telegram.KickChatMember(ctx, string(s.Token), chatID, userID); err != nil {
+	if err := telegram.KickChatMember(ctx, string(s.GetToken()), chatID, userID); err != nil {
 		return err
 	}
-	telegram.SendMessage(ctx, string(s.Token), chatID, fmt.Sprintf("user %s banned", updateReq.Message.ReplyToMessage.From.UserName))
+	telegram.SendMessage(ctx, string(s.GetToken()), chatID, fmt.Sprintf("user %s banned", updateReq.Message.ReplyToMessage.From.UserName))
 	return nil
 }

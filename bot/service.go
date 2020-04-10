@@ -2,10 +2,12 @@ package bot
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
+	"cthulhu/store"
 	"cthulhu/telegram"
 )
 
@@ -18,20 +20,20 @@ type Service interface {
 
 type service struct {
 	Logger log.Logger
-	Token  Token
 	Config Config
+	Store  store.Service
 }
 
-func NewService(logger log.Logger, config Config, token Token) *service {
+func NewService(logger log.Logger, config Config, storeService store.Service) *service {
 	return &service{
 		Logger: logger,
-		Token:  token,
 		Config: config,
+		Store:  storeService,
 	}
 }
 
 func (s *service) GetToken() Token {
-	return s.Token
+	return s.Config.Bot.Token
 }
 
 func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error {
@@ -44,6 +46,8 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		return nil
 	}
 
+	s.Store.Create(ctx, strconv.Itoa(updateReq.UpdateID), updateReq)
+
 	if updateReq.Message.NewChatMembers != nil {
 		s.handleNewUsers(ctx, updateReq)
 	}
@@ -52,7 +56,7 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		level.Info(s.Logger).Log("msg", "received new command", "command", command)
 		switch command {
 		case pingCommand:
-			return telegram.SendMessage(ctx, string(s.Token), updateReq.Message.Chat.ID, "pong")
+			return telegram.SendMessage(ctx, string(s.GetToken()), updateReq.Message.Chat.ID, "pong")
 		case banCommand:
 			return s.handleBan(ctx, updateReq)
 		case unbanCommand:
@@ -61,7 +65,6 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 			return s.handleBroadcast(ctx, updateReq)
 		}
 	}
-
 	return s.handleCrossposts(ctx, updateReq)
 }
 
@@ -83,7 +86,7 @@ func (s *service) handleNewUsers(ctx context.Context, updateReq *telegram.Update
 		if g.Group.ID == originID {
 			if g.Group.WelcomeMessage != "" {
 				for range *updateReq.Message.NewChatMembers {
-					telegram.Reply(ctx, string(s.Token), g.Group.ID, g.Group.WelcomeMessage, updateReq.Message.MessageID)
+					telegram.Reply(ctx, string(s.GetToken()), g.Group.ID, g.Group.WelcomeMessage, updateReq.Message.MessageID)
 				}
 			}
 		}

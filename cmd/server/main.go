@@ -1,17 +1,21 @@
 package main
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"os"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"github.com/robfig/cron/v3"
 	"gopkg.in/yaml.v2"
 
 	"cthulhu/bot"
 	"cthulhu/cmd"
 	"cthulhu/endpoint"
+	"cthulhu/store"
+	"cthulhu/task"
 	"cthulhu/transport"
 )
 
@@ -31,13 +35,12 @@ var (
 
 func main() {
 	var (
-		logger log.Logger = cmd.MakeLogger()
-
-		config      bot.Config    = readConfig(logger, configFile)
-		botService  bot.Service   = bot.NewService(logger, config, botToken)
-		endpointSet *endpoint.Set = endpoint.NewSet(botService)
-
-		httpHandler http.Handler = transport.MakeHTTPHandler(
+		logger       log.Logger    = cmd.MakeLogger()
+		config       bot.Config    = readConfig(logger, configFile, botToken)
+		storeService store.Service = store.NewInMemory(logger)
+		botService   bot.Service   = bot.NewService(logger, config, storeService)
+		endpointSet  *endpoint.Set = endpoint.NewSet(botService)
+		httpHandler  http.Handler  = transport.MakeHTTPHandler(
 			botService,
 			*endpointSet,
 			logger,
@@ -46,6 +49,9 @@ func main() {
 
 	level.Info(logger).Log("msg", "start")
 	defer level.Info(logger).Log("msg", "stop")
+
+	level.Info(logger).Log("msg", "tasks registered", "tasks", task.Registry)
+	go registerTasks(logger, config, storeService)
 
 	if err := http.ListenAndServeTLS(listenAddress, certFile, keyFile, httpHandler); err != nil {
 		level.Error(logger).Log(
@@ -56,7 +62,32 @@ func main() {
 	}
 }
 
-func readConfig(logger log.Logger, path string) bot.Config {
+func registerTasks(logger log.Logger, cfg bot.Config, st store.Service) {
+	c := cron.New()
+	for _, t := range cfg.Bot.Tasks {
+		f, ok := task.Registry[t.Task.Name]
+		if !ok {
+			level.Error(logger).Log(
+				"msg", "task not implemented",
+				"task_name", t.Task.Name,
+			)
+			os.Exit(1)
+		}
+		c.AddFunc(
+			t.Task.Cron,
+			f(
+				context.Background(),
+				log.With(logger, "task", t.Task.Name),
+				cfg,
+				st,
+				t.Task.Args,
+			),
+		)
+	}
+	c.Start()
+}
+
+func readConfig(logger log.Logger, path string, token bot.Token) bot.Config {
 	var cfg bot.Config
 
 	data, err := ioutil.ReadFile(path)
@@ -69,6 +100,7 @@ func readConfig(logger log.Logger, path string) bot.Config {
 	}
 
 	err = yaml.Unmarshal([]byte(data), &cfg)
+
 	if err != nil {
 		level.Error(logger).Log(
 			"msg", "config file data is invalid",
@@ -76,5 +108,8 @@ func readConfig(logger log.Logger, path string) bot.Config {
 		)
 		os.Exit(1)
 	}
+
+	cfg.Bot.Token = token
+
 	return cfg
 }

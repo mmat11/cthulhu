@@ -2,8 +2,16 @@ package bot
 
 type Token string
 
+type TaskArgs []struct {
+	Arg struct {
+		Name  string `yaml:"name"`
+		Value string `yaml:"value"`
+	} `yaml:"arg"`
+}
+
 type Config struct {
 	Bot struct {
+		Token         Token
 		AccessControl struct {
 			Groups []struct {
 				Group struct {
@@ -22,6 +30,13 @@ type Config struct {
 				} `yaml:"group"`
 			} `yaml:"groups"`
 		} `yaml:"access_control"`
+		Tasks []struct {
+			Task struct {
+				Name string   `yaml:"name"`
+				Cron string   `yaml:"cron"`
+				Args TaskArgs `yaml:"args"`
+			} `yaml:"task"`
+		} `yaml:"tasks"`
 	} `yaml:"bot"`
 }
 
