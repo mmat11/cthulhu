@@ -24,12 +24,12 @@ type service struct {
 	Store  store.Service
 }
 
-func NewService(logger log.Logger, config Config, token Token) *service {
+func NewService(logger log.Logger, config Config, token Token, storeService store.Service) *service {
 	return &service{
 		Logger: logger,
 		Token:  token,
 		Config: config,
-		Store:  store.NewInMemory(),
+		Store:  storeService,
 	}
 }
 
@@ -38,11 +38,11 @@ func (s *service) GetToken() Token {
 }
 
 func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error {
-	s.Store.Create(ctx, string(updateReq.UpdateID), updateReq)
-
 	if updateReq.Message == nil {
 		return nil
 	}
+
+	s.Store.Create(ctx, string(updateReq.UpdateID), updateReq)
 
 	if !s.checkOrigin(ctx, updateReq) {
 		level.Error(s.Logger).Log("msg", "group is not part of the network")

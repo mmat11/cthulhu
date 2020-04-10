@@ -1,4 +1,4 @@
-package store
+package store_test
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cthulhu/mock"
+	"cthulhu/store"
 	"cthulhu/telegram"
 )
 
@@ -59,7 +60,7 @@ func TestCreateAlreadyExists(t *testing.T) {
 		svc.
 			EXPECT().
 			Create(ctx, key, val).
-			Return(ErrKeyAlreadyExists),
+			Return(store.ErrKeyAlreadyExists),
 	)
 
 	if err := svc.Create(ctx, key, val); err != nil {
@@ -121,9 +122,9 @@ func TestReadNotFound(t *testing.T) {
 	svc.
 		EXPECT().
 		Read(ctx, key).
-		Return(nil, ErrKeyNotFound)
+		Return(nil, store.ErrKeyNotFound)
 
-	if _, err := svc.Read(ctx, key); err != ErrKeyNotFound {
+	if _, err := svc.Read(ctx, key); err != store.ErrKeyNotFound {
 		t.Fatal(err)
 	}
 }
@@ -195,9 +196,9 @@ func TestUpdateNotFound(t *testing.T) {
 	svc.
 		EXPECT().
 		Update(ctx, key, newVal).
-		Return(ErrKeyNotFound)
+		Return(store.ErrKeyNotFound)
 
-	if err := svc.Update(ctx, key, newVal); err != ErrKeyNotFound {
+	if err := svc.Update(ctx, key, newVal); err != store.ErrKeyNotFound {
 		t.Fatal(err)
 	}
 }
@@ -229,7 +230,7 @@ func TestDeleteOk(t *testing.T) {
 		svc.
 			EXPECT().
 			Read(ctx, key).
-			Return(nil, ErrKeyNotFound),
+			Return(nil, store.ErrKeyNotFound),
 	)
 
 	if err := svc.Create(ctx, key, val); err != nil {
@@ -242,7 +243,7 @@ func TestDeleteOk(t *testing.T) {
 			t.Fatalf("expected %v, got %v", val, v)
 		}
 	}
-	if _, err := svc.Read(ctx, key); err != ErrKeyNotFound {
+	if _, err := svc.Read(ctx, key); err != store.ErrKeyNotFound {
 		t.Fatal(err)
 	}
 }
@@ -260,9 +261,9 @@ func TestDeleteNotFound(t *testing.T) {
 	svc.
 		EXPECT().
 		Delete(ctx, key).
-		Return(nil, ErrKeyNotFound)
+		Return(nil, store.ErrKeyNotFound)
 
-	if _, err := svc.Delete(ctx, key); err != ErrKeyNotFound {
+	if _, err := svc.Delete(ctx, key); err != store.ErrKeyNotFound {
 		t.Fatal(err)
 	}
 }

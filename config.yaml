@@ -38,10 +38,6 @@ bot:
               - 43120899   # @mirioo
               - 40323575   # @lucacavallaro
               - 82046673   # @ugolandini
-          tasks:
-            - task:
-                name: "welcome-new-members"
-                cron: ""
       - group:
           id: -1001141557431
           url: t.me/golangita
@@ -80,3 +76,11 @@ bot:
               - 43120899   # @mirioo
               - 797091005  # @pr0metherion
               - 40323575   # @lucacavallaro
+  tasks:
+    - task:
+        name: CleanupUpdates
+        cron: '@every 5m'
+        args:
+          - arg:
+              name: olderThan
+              value: 7200  # seconds

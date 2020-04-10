@@ -17,4 +17,5 @@ type Service interface {
 	Read(ctx context.Context, key string) (*telegram.Update, error)
 	Update(ctx context.Context, key string, value *telegram.Update) error
 	Delete(ctx context.Context, key string) (*telegram.Update, error)
+	GetAll(ctx context.Context) map[string]*telegram.Update
 }

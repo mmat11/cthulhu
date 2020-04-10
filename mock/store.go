@@ -63,6 +63,20 @@ func (mr *StoreServiceMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*StoreService)(nil).Delete), arg0, arg1)
 }
 
+// GetAll mocks base method
+func (m *StoreService) GetAll(arg0 context.Context) map[string]*telegram.Update {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll", arg0)
+	ret0, _ := ret[0].(map[string]*telegram.Update)
+	return ret0
+}
+
+// GetAll indicates an expected call of GetAll
+func (mr *StoreServiceMockRecorder) GetAll(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*StoreService)(nil).GetAll), arg0)
+}
+
 // Read mocks base method
 func (m *StoreService) Read(arg0 context.Context, arg1 string) (*telegram.Update, error) {
 	m.ctrl.T.Helper()
