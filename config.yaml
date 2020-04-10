@@ -78,7 +78,7 @@ bot:
               - 40323575   # @lucacavallaro
   tasks:
     - task:
-        name: CleanupUpdates
+        name: StoreCleanup
         cron: '@every 5m'
         args:
           - arg:

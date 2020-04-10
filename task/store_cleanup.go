@@ -13,10 +13,10 @@ import (
 )
 
 func init() {
-	Register("CleanupUpdates", CleanupUpdates)
+	Register("StoreCleanup", StoreCleanup)
 }
 
-func CleanupUpdates(
+func StoreCleanup(
 	ctx context.Context,
 	logger log.Logger,
 	config bot.Config,
