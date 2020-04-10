@@ -36,9 +36,9 @@ var (
 func main() {
 	var (
 		logger       log.Logger    = cmd.MakeLogger()
-		config       bot.Config    = readConfig(logger, configFile)
+		config       bot.Config    = readConfig(logger, configFile, botToken)
 		storeService store.Service = store.NewInMemory(logger)
-		botService   bot.Service   = bot.NewService(logger, config, botToken, storeService)
+		botService   bot.Service   = bot.NewService(logger, config, storeService)
 		endpointSet  *endpoint.Set = endpoint.NewSet(botService)
 		httpHandler  http.Handler  = transport.MakeHTTPHandler(
 			botService,
@@ -50,6 +50,7 @@ func main() {
 	level.Info(logger).Log("msg", "start")
 	defer level.Info(logger).Log("msg", "stop")
 
+	level.Info(logger).Log("msg", "tasks registered", "tasks", task.Registry)
 	go registerTasks(logger, config, storeService)
 
 	if err := http.ListenAndServeTLS(listenAddress, certFile, keyFile, httpHandler); err != nil {
@@ -86,7 +87,7 @@ func registerTasks(logger log.Logger, cfg bot.Config, st store.Service) {
 	c.Start()
 }
 
-func readConfig(logger log.Logger, path string) bot.Config {
+func readConfig(logger log.Logger, path string, token bot.Token) bot.Config {
 	var cfg bot.Config
 
 	data, err := ioutil.ReadFile(path)
@@ -107,5 +108,8 @@ func readConfig(logger log.Logger, path string) bot.Config {
 		)
 		os.Exit(1)
 	}
+
+	cfg.Bot.Token = token
+
 	return cfg
 }

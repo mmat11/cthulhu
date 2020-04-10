@@ -60,7 +60,7 @@ bot:
       - group:
           id: -1001271237061
           url: t.me/kafkastreaming
-          welcome_message: "👋 e benvenuto, cosa fai di bello con kafka/nats/pulsar/streaming vari?"
+          welcome_message: '👋 e benvenuto, cosa fai di bello con kafka/nats/pulsar/streaming vari?'
           crosspost_tags:
             - kafka
           admin:
@@ -84,3 +84,19 @@ bot:
           - arg:
               name: retention
               value: 86400  # 24h
+    - task:
+        name: WelcomeMessage
+        cron: '@every 10s' #'05 8,12,16,20 * * *'
+        args:
+          - arg:
+              name: kubernetesITCfg
+              value: |
+                group_id: -1001476422781
+                message_template_single: '👋 e benvenuto {{.NewUsers}}. Cosa fai di bello con k8s?'
+                message_template_multiple: '👋 e benvenuti {{.NewUsers}}. Cosa fate di bello con k8s?'
+          - arg:
+              name: devopsITCfg
+              value: |
+                group_id: -1001150551096
+                message_template_single: 'Benvenuto {{.NewUsers}}!'
+                message_template_multiple: 'Benvenuti {{.NewUsers}}!'

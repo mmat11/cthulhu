@@ -14,14 +14,17 @@ import (
 )
 
 func init() {
-	Register("StoreCleanup", StoreCleanup)
+	Register(storeCleanupTaskName, StoreCleanupTask)
 }
 
-const retentionKey string = "retention"
+const (
+	storeCleanupTaskName string = "StoreCleanup"
+	retentionKey         string = "retention"
+)
 
 var defaultRetention = 7200
 
-func StoreCleanup(
+func StoreCleanupTask(
 	ctx context.Context,
 	logger log.Logger,
 	config bot.Config,

@@ -11,6 +11,7 @@ type TaskArgs []struct {
 
 type Config struct {
 	Bot struct {
+		Token         Token
 		AccessControl struct {
 			Groups []struct {
 				Group struct {
