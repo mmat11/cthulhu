@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -42,7 +43,7 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		return nil
 	}
 
-	s.Store.Create(ctx, string(updateReq.UpdateID), updateReq)
+	s.Store.Create(ctx, strconv.Itoa(updateReq.UpdateID), updateReq)
 
 	if !s.checkOrigin(ctx, updateReq) {
 		level.Error(s.Logger).Log("msg", "group is not part of the network")
