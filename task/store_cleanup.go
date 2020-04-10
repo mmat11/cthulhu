@@ -10,11 +10,16 @@ import (
 
 	"cthulhu/bot"
 	"cthulhu/store"
+	"cthulhu/telegram"
 )
 
 func init() {
 	Register("StoreCleanup", StoreCleanup)
 }
+
+const retentionKey string = "retention"
+
+var defaultRetention = 7200
 
 func StoreCleanup(
 	ctx context.Context,
@@ -25,17 +30,19 @@ func StoreCleanup(
 	return func() {
 		level.Info(logger).Log("msg", "running task")
 
-		var olderThan int = 3600 // defaults to 1h
+		var retention int = defaultRetention
 
 		for _, arg := range args {
-			if arg.Arg.Name == "olderThan" {
-				olderThan, _ = strconv.Atoi(arg.Arg.Value)
+			if arg.Arg.Name == retentionKey {
+				retention, _ = strconv.Atoi(arg.Arg.Value)
 			}
 		}
-		for uID, update := range store.GetAll(ctx) {
-			if update.Message.Date < int(time.Now().Unix())-olderThan {
-				if _, err := store.Delete(ctx, uID); err != nil {
-					level.Error(logger).Log("msg", "error deleting key", "key", uID)
+		for k, v := range store.GetAll(ctx) {
+			if u, ok := v.(*telegram.Update); ok {
+				if u.Message.Date < int(time.Now().Unix())-retention {
+					if _, err := store.Delete(ctx, k); err != nil {
+						level.Error(logger).Log("msg", "error deleting key", "key", k, "err", err)
+					}
 				}
 			}
 		}

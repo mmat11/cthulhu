@@ -6,21 +6,19 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-
-	"cthulhu/telegram"
 )
 
 type service struct {
-	KV     map[string]*telegram.Update
+	KV     map[string]interface{}
 	mu     sync.Mutex
 	Logger log.Logger
 }
 
 func NewInMemory(logger log.Logger) *service {
-	return &service{KV: make(map[string]*telegram.Update), Logger: logger}
+	return &service{KV: make(map[string]interface{}), Logger: logger}
 }
 
-func (s *service) Create(ctx context.Context, key string, value *telegram.Update) error {
+func (s *service) Create(ctx context.Context, key string, value interface{}) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -33,14 +31,14 @@ func (s *service) Create(ctx context.Context, key string, value *telegram.Update
 	return nil
 }
 
-func (s *service) Read(ctx context.Context, key string) (*telegram.Update, error) {
+func (s *service) Read(ctx context.Context, key string) (interface{}, error) {
 	if v, ok := s.KV[key]; ok {
 		return v, nil
 	}
 	return nil, ErrKeyNotFound
 }
 
-func (s *service) Update(ctx context.Context, key string, value *telegram.Update) error {
+func (s *service) Update(ctx context.Context, key string, value interface{}) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -53,8 +51,8 @@ func (s *service) Update(ctx context.Context, key string, value *telegram.Update
 	return ErrKeyNotFound
 }
 
-func (s *service) Delete(ctx context.Context, key string) (*telegram.Update, error) {
-	var v *telegram.Update
+func (s *service) Delete(ctx context.Context, key string) (interface{}, error) {
+	var v interface{}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -69,7 +67,7 @@ func (s *service) Delete(ctx context.Context, key string) (*telegram.Update, err
 	return v, nil
 }
 
-func (s *service) GetAll(ctx context.Context) map[string]*telegram.Update {
+func (s *service) GetAll(ctx context.Context) map[string]interface{} {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.KV

@@ -3,8 +3,6 @@ package store
 import (
 	"context"
 	"errors"
-
-	"cthulhu/telegram"
 )
 
 var (
@@ -13,9 +11,9 @@ var (
 )
 
 type Service interface {
-	Create(ctx context.Context, key string, value *telegram.Update) error
-	Read(ctx context.Context, key string) (*telegram.Update, error)
-	Update(ctx context.Context, key string, value *telegram.Update) error
-	Delete(ctx context.Context, key string) (*telegram.Update, error)
-	GetAll(ctx context.Context) map[string]*telegram.Update
+	Create(ctx context.Context, key string, value interface{}) error
+	Read(ctx context.Context, key string) (interface{}, error)
+	Update(ctx context.Context, key string, value interface{}) error
+	Delete(ctx context.Context, key string) (interface{}, error)
+	GetAll(ctx context.Context) map[string]interface{}
 }

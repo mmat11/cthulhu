@@ -82,5 +82,5 @@ bot:
         cron: '@every 5m'
         args:
           - arg:
-              name: olderThan
-              value: 7200  # seconds
+              name: retention
+              value: 86400  # 24h
