@@ -64,18 +64,24 @@ func main() {
 func registerTasks(logger log.Logger, cfg bot.Config, st store.Service) {
 	c := cron.New()
 	for _, t := range cfg.Bot.Tasks {
-		if f, ok := task.Registry[t.Task.Name]; ok {
-			c.AddFunc(
-				t.Task.Cron,
-				f(
-					context.Background(),
-					log.With(logger, "task", t.Task.Name),
-					cfg,
-					st,
-					t.Task.Args,
-				),
+		f, ok := task.Registry[t.Task.Name]
+		if !ok {
+			level.Error(logger).Log(
+				"msg", "task not implemented",
+				"task_name", t.Task.Name,
 			)
+			os.Exit(1)
 		}
+		c.AddFunc(
+			t.Task.Cron,
+			f(
+				context.Background(),
+				log.With(logger, "task", t.Task.Name),
+				cfg,
+				st,
+				t.Task.Args,
+			),
+		)
 	}
 	c.Start()
 }
