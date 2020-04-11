@@ -52,12 +52,12 @@ bot:
           - arg:
               name: 1Cfg
               value: |
-                group_id: -1001476422781
+                group_id: -1001206134473
                 message_template_single: 'welcome (single) {{.NewUsers}} in test group 1'
                 message_template_multiple: 'welcome (multiple) {{.NewUsers}} in test group 1'
           - arg:
               name: 2Cfg
               value: |
-                group_id: -1001150551096
+                group_id: -1001326675343
                 message_template_single: 'welcome (single) {{.NewUsers}} in test group 2'
                 message_template_multiple: 'welcome (multiple) {{.NewUsers}} in test group 2'
