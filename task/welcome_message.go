@@ -44,11 +44,10 @@ func WelcomeMessageTask(
 		level.Info(logger).Log("msg", "running task")
 
 		var (
-			newUsersFromUpdates []string
-			newUsers            []string
-			taskConfigs         map[string]taskConfig = make(map[string]taskConfig)
-			tpl                 string
-			tplData             tmplData
+			newUsersFromUpdates, newUsers []string
+			taskConfigs                   map[string]taskConfig = make(map[string]taskConfig)
+			tpl                           string
+			tplData                       tmplData
 		)
 
 		for _, arg := range args {
@@ -68,7 +67,6 @@ func WelcomeMessageTask(
 			}
 
 			newUsersFromUpdates = getNewUsers(ctx, store, groupID)
-
 			usersAlreadyProcessed, err := getUsersProcessed(ctx, store, groupID)
 			if err != nil {
 				level.Error(logger).Log("msg", "error while getting processed users", "err", err)
@@ -102,6 +100,7 @@ func WelcomeMessageTask(
 			}
 			tg.SendMessage(ctx, int64FromStr(groupID), message)
 			setUsersProcessed(ctx, store, groupID, newUsers)
+			newUsers = []string{}
 		}
 	}
 }

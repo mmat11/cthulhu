@@ -12,20 +12,29 @@ import (
 
 func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
 	var (
-		hashTags map[string]struct{} = make(map[string]struct{})
-		originID int64               = updateReq.Message.Chat.ID
-		authorID int                 = updateReq.Message.From.ID
-		text     string              = fmt.Sprintf("@%s >", updateReq.Message.Chat.UserName)
+		hashTags   map[string]struct{} = make(map[string]struct{})
+		originID   int64               = updateReq.Message.Chat.ID
+		authorID   int                 = updateReq.Message.From.ID
+		originName string
+		text       string
 	)
+
+	if !s.Config.isModerator(originID, authorID) && !s.Config.isAdmin(originID, authorID) {
+		return nil
+	}
+
+	if updateReq.Message.Chat.UserName != "" {
+		originName = updateReq.Message.Chat.UserName
+		text = fmt.Sprintf("@%s >", originName)
+	} else {
+		originName = updateReq.Message.Chat.Title
+		text = fmt.Sprintf("%s >", originName)
+	}
 
 	if updateReq.Message.ReplyToMessage == nil {
 		text += fmt.Sprintf(" %s", updateReq.Message.Text)
 	} else {
 		text += fmt.Sprintf(" %s", updateReq.Message.ReplyToMessage.Text)
-	}
-
-	if !s.Config.isModerator(originID, authorID) && !s.Config.isAdmin(originID, authorID) {
-		return nil
 	}
 
 	if entities := updateReq.Message.Entities; entities != nil {
@@ -44,7 +53,7 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		for _, hashTag := range g.Group.CrossPostTags {
 			if _, ok := hashTags[hashTag]; ok {
 				if g.Group.ID != originID {
-					level.Info(s.Logger).Log("msg", "crossposting", "text", text, "to", g.Group.ID)
+					level.Info(s.Logger).Log("msg", "crossposting", "text", text, "to", g.Group.ID, "from", updateReq.Message.Chat.UserName)
 					s.Telegram.SendMessage(ctx, g.Group.ID, text)
 				}
 			}

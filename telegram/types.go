@@ -961,21 +961,3 @@ type Error struct {
 func (e Error) Error() string {
 	return e.Message
 }
-
-type SendMessageBody struct {
-	ChatID                int64  `json:"chat_id"`
-	Text                  string `json:"message_text"`
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
-	ReplyToMessageID      int    `json:"reply_to_message_id"`
-}
-
-type KickChatMemberBody struct {
-	ChatID int64 `json:"chat_id"`
-	UserID int   `json:"user_id"`
-}
-
-type UnbanChatMemberBody struct {
-	ChatID int64 `json:"chat_id"`
-	UserID int   `json:"user_id"`
-}

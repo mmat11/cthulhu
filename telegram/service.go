@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 type Service interface {
@@ -39,20 +40,17 @@ func (s *service) buildURL(method string) string {
 func (s *service) doRequest(ctx context.Context, url string, reqBody []byte) error {
 	var tgResp APIResponse
 
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
+		level.Error(s.Logger).Log("msg", "failed to create request", "err", err)
 		return err
 	}
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		level.Error(s.Logger).Log("msg", "failed reading response", "err", err)
+	}
 
 	json.Unmarshal(body, &tgResp)
 	if !tgResp.Ok {
@@ -65,14 +63,13 @@ func (s *service) SendMessage(ctx context.Context, chatID int64, text string) er
 	// https://core.telegram.org/bots/api#sendmessage
 	const method = "sendMessage"
 
-	req := SendMessageBody{
-		ChatID:                chatID,
-		Text:                  text,
-		DisableWebPagePreview: true,
-	}
-
-	reqJSON, err := json.Marshal(req)
+	reqJSON, err := json.Marshal(map[string]interface{}{
+		"chat_id":                  chatID,
+		"text":                     text,
+		"disable_web_page_preview": true,
+	})
 	if err != nil {
+		level.Error(s.Logger).Log("msg", "failed marshalling json", "err", err)
 		return err
 	}
 
@@ -83,15 +80,14 @@ func (s *service) Reply(ctx context.Context, chatID int64, text string, messageI
 	// https://core.telegram.org/bots/api#sendmessage
 	const method = "sendMessage"
 
-	req := SendMessageBody{
-		ChatID:                chatID,
-		Text:                  text,
-		DisableWebPagePreview: true,
-		ReplyToMessageID:      messageID,
-	}
-
-	reqJSON, err := json.Marshal(req)
+	reqJSON, err := json.Marshal(map[string]interface{}{
+		"chat_id":                  chatID,
+		"text":                     text,
+		"disable_web_page_preview": true,
+		"reply_to_message_id":      messageID,
+	})
 	if err != nil {
+		level.Error(s.Logger).Log("msg", "failed marshalling json", "err", err)
 		return err
 	}
 
@@ -102,13 +98,12 @@ func (s *service) KickChatMember(ctx context.Context, chatID int64, userID int) 
 	// https://core.telegram.org/bots/api#kickchatmember
 	const method = "kickChatMember"
 
-	req := KickChatMemberBody{
-		ChatID: chatID,
-		UserID: userID,
-	}
-
-	reqJSON, err := json.Marshal(req)
+	reqJSON, err := json.Marshal(map[string]interface{}{
+		"chat_id": chatID,
+		"user_id": userID,
+	})
 	if err != nil {
+		level.Error(s.Logger).Log("msg", "failed marshalling json", "err", err)
 		return err
 	}
 
@@ -119,13 +114,12 @@ func (s *service) UnbanChatMember(ctx context.Context, chatID int64, userID int)
 	// https://core.telegram.org/bots/api#unbanchatmember
 	const method = "unbanChatMember"
 
-	req := UnbanChatMemberBody{
-		ChatID: chatID,
-		UserID: userID,
-	}
-
-	reqJSON, err := json.Marshal(req)
+	reqJSON, err := json.Marshal(map[string]interface{}{
+		"chat_id": chatID,
+		"user_id": userID,
+	})
 	if err != nil {
+		level.Error(s.Logger).Log("msg", "failed marshalling json", "err", err)
 		return err
 	}
 
