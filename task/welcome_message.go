@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"text/template"
 
@@ -98,7 +99,8 @@ func WelcomeMessageTask(
 				level.Error(logger).Log("msg", "failed to process template", "err", err)
 				continue
 			}
-			telegram.SendMessage(ctx, string(config.Bot.Token), int64FromStr(groupID), message)
+			//telegram.SendMessage(ctx, string(config.Bot.Token), int64FromStr(groupID), message)
+			level.Info(logger).Log("msg", "sending welcome message", "group_id", int64FromStr(groupID), "message", message)
 			setUsersProcessed(ctx, store, groupID, newUsers)
 		}
 	}
@@ -143,18 +145,16 @@ func setUsersProcessed(ctx context.Context, store store.Service, groupID string,
 }
 
 func getNewUsers(ctx context.Context, store store.Service, groupID string) []string {
-	var (
-		newUsers   []string
-		userWithAt string
-	)
+	var newUsers []string
 
 	for _, v := range store.GetAll(ctx) {
 		if u, ok := v.(*telegram.Update); ok {
 			if u.Message.Chat.ID == int64FromStr(groupID) {
 				if u.Message.NewChatMembers != nil {
 					for _, user := range *u.Message.NewChatMembers {
-						userWithAt = "@" + user.UserName
-						newUsers = append(newUsers, userWithAt)
+						if user.UserName != "" {
+							newUsers = append(newUsers, fmt.Sprintf("@%s", user.UserName))
+						}
 					}
 				}
 
