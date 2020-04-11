@@ -2,7 +2,7 @@ bot:
   access_control:
     groups:
       - group:
-          id: -1
+          id: -1001206134473
           url: t.me/cthulhutest1
           crosspost_tags:
             - test1
@@ -14,7 +14,7 @@ bot:
               - unban
               - broadcast
       - group:
-          id: -2
+          id: -1001326675343
           url: t.me/cthulhutest2
           crosspost_tags:
             - test2
@@ -26,7 +26,7 @@ bot:
               - unban
               - broadcast
       - group:
-          id: -3
+          id: -1001291174532
           url: t.me/cthulhutest3
           crosspost_tags:
             - test3
