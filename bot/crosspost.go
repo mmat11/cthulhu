@@ -45,7 +45,7 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 			if _, ok := hashTags[hashTag]; ok {
 				if g.Group.ID != originID {
 					level.Info(s.Logger).Log("msg", "crossposting", "text", text, "to", g.Group.ID)
-					telegram.SendMessage(ctx, string(s.GetToken()), g.Group.ID, text)
+					s.Telegram.SendMessage(ctx, g.Group.ID, text)
 				}
 			}
 		}

@@ -38,6 +38,7 @@ func WelcomeMessageTask(
 	logger log.Logger,
 	config bot.Config,
 	store store.Service,
+	tg telegram.Service,
 	args bot.TaskArgs) func() {
 	return func() {
 		level.Info(logger).Log("msg", "running task")
@@ -99,8 +100,7 @@ func WelcomeMessageTask(
 				level.Error(logger).Log("msg", "failed to process template", "err", err)
 				continue
 			}
-			//telegram.SendMessage(ctx, string(config.Bot.Token), int64FromStr(groupID), message)
-			level.Info(logger).Log("msg", "sending welcome message", "group_id", int64FromStr(groupID), "message", message)
+			tg.SendMessage(ctx, int64FromStr(groupID), message)
 			setUsersProcessed(ctx, store, groupID, newUsers)
 		}
 	}

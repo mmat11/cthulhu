@@ -37,7 +37,7 @@ func (s *service) handleBroadcast(ctx context.Context, updateReq *telegram.Updat
 					"chat_id", g.Group.ID,
 					"message", message,
 				)
-				telegram.SendMessage(ctx, string(s.GetToken()), g.Group.ID, message)
+				s.Telegram.SendMessage(ctx, g.Group.ID, message)
 			}
 		}
 	}

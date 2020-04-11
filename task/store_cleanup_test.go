@@ -41,17 +41,19 @@ func TestStoreCleanupTask(t *testing.T) {
 		}
 	)
 
-	svc := mock.NewStoreService(ctrl)
+	storeSvc := mock.NewStoreService(ctrl)
 	gomock.InOrder(
-		svc.
+		storeSvc.
 			EXPECT().
 			GetAll(ctx).
 			Return(allUpdates),
-		svc.
+		storeSvc.
 			EXPECT().
 			Delete(ctx, "1").
 			Return(nil, nil),
 	)
 
-	StoreCleanupTask(ctx, log.NewNopLogger(), bot.Config{}, svc, taskArgs)()
+	telegramSvc := mock.NewTelegramService(ctrl)
+
+	StoreCleanupTask(ctx, log.NewNopLogger(), bot.Config{}, storeSvc, telegramSvc, taskArgs)()
 }

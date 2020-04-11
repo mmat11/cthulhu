@@ -16,6 +16,7 @@ import (
 	"cthulhu/endpoint"
 	"cthulhu/store"
 	"cthulhu/task"
+	"cthulhu/telegram"
 	"cthulhu/transport"
 )
 
@@ -27,6 +28,9 @@ const (
 
 	// bot
 	configFile = "config.yaml"
+
+	// telegram
+	apiEndpoint = "https://api.telegram.org"
 )
 
 var (
@@ -35,12 +39,13 @@ var (
 
 func main() {
 	var (
-		logger       log.Logger    = cmd.MakeLogger()
-		config       bot.Config    = readConfig(logger, configFile, botToken)
-		storeService store.Service = store.NewInMemory(logger)
-		botService   bot.Service   = bot.NewService(logger, config, storeService)
-		endpointSet  *endpoint.Set = endpoint.NewSet(botService)
-		httpHandler  http.Handler  = transport.MakeHTTPHandler(
+		logger          log.Logger       = cmd.MakeLogger()
+		config          bot.Config       = readConfig(logger, configFile, botToken)
+		storeService    store.Service    = store.NewInMemory(logger)
+		telegramService telegram.Service = telegram.NewService(logger, apiEndpoint, string(botToken))
+		botService      bot.Service      = bot.NewService(logger, config, storeService, telegramService)
+		endpointSet     *endpoint.Set    = endpoint.NewSet(botService)
+		httpHandler     http.Handler     = transport.MakeHTTPHandler(
 			botService,
 			*endpointSet,
 			logger,
@@ -51,7 +56,7 @@ func main() {
 	defer level.Info(logger).Log("msg", "stop")
 
 	level.Info(logger).Log("msg", "tasks registered", "tasks", task.Registry)
-	go registerTasks(logger, config, storeService)
+	go registerTasks(logger, config, storeService, telegramService)
 
 	if err := http.ListenAndServeTLS(listenAddress, certFile, keyFile, httpHandler); err != nil {
 		level.Error(logger).Log(
@@ -62,7 +67,7 @@ func main() {
 	}
 }
 
-func registerTasks(logger log.Logger, cfg bot.Config, st store.Service) {
+func registerTasks(logger log.Logger, cfg bot.Config, st store.Service, tg telegram.Service) {
 	c := cron.New()
 	for _, t := range cfg.Bot.Tasks {
 		f, ok := task.Registry[t.Task.Name]
@@ -80,6 +85,7 @@ func registerTasks(logger log.Logger, cfg bot.Config, st store.Service) {
 				log.With(logger, "task", t.Task.Name),
 				cfg,
 				st,
+				tg,
 				t.Task.Args,
 			),
 		)

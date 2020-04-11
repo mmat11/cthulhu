@@ -7,15 +7,36 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/go-kit/kit/log"
 )
 
-const apiURL = "https://api.telegram.org"
-
-func buildURL(token string, method string) string {
-	return fmt.Sprintf("%s/bot%s/%s", apiURL, token, method)
+type Service interface {
+	SendMessage(ctx context.Context, chatID int64, text string) error
+	Reply(ctx context.Context, chatID int64, text string, messageID int) error
+	KickChatMember(ctx context.Context, chatID int64, userID int) error
+	UnbanChatMember(ctx context.Context, chatID int64, userID int) error
 }
 
-func doRequest(url string, reqBody []byte) error {
+type service struct {
+	apiEndpoint string
+	apiToken    string
+	Logger      log.Logger
+}
+
+func NewService(logger log.Logger, apiEndpoint string, apiToken string) *service {
+	return &service{
+		apiEndpoint: apiEndpoint,
+		apiToken:    apiToken,
+		Logger:      logger,
+	}
+}
+
+func (s *service) buildURL(method string) string {
+	return fmt.Sprintf("%s/bot%s/%s", s.apiEndpoint, s.apiToken, method)
+}
+
+func (s *service) doRequest(ctx context.Context, url string, reqBody []byte) error {
 	var tgResp APIResponse
 
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
@@ -40,42 +61,73 @@ func doRequest(url string, reqBody []byte) error {
 	return nil
 }
 
-func SendMessage(ctx context.Context, token string, chatID int64, text string) error {
+func (s *service) SendMessage(ctx context.Context, chatID int64, text string) error {
 	// https://core.telegram.org/bots/api#sendmessage
 	const method = "sendMessage"
-	var (
-		url  string = buildURL(token, method)
-		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","text":"%v","disable_web_page_preview":"true"}`, chatID, text))
-	)
-	return doRequest(url, body)
+
+	req := SendMessageBody{
+		ChatID:                chatID,
+		Text:                  text,
+		DisableWebPagePreview: true,
+	}
+
+	reqJSON, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	return s.doRequest(ctx, s.buildURL(method), reqJSON)
 }
 
-func Reply(ctx context.Context, token string, chatID int64, text string, messageID int) error {
+func (s *service) Reply(ctx context.Context, chatID int64, text string, messageID int) error {
 	// https://core.telegram.org/bots/api#sendmessage
 	const method = "sendMessage"
-	var (
-		url  string = buildURL(token, method)
-		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","text":"%v","reply_to_message_id":"%v","disable_web_page_preview":"true"}`, chatID, text, messageID))
-	)
-	return doRequest(url, body)
+
+	req := SendMessageBody{
+		ChatID:                chatID,
+		Text:                  text,
+		DisableWebPagePreview: true,
+		ReplyToMessageID:      messageID,
+	}
+
+	reqJSON, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	return s.doRequest(ctx, s.buildURL(method), reqJSON)
 }
 
-func KickChatMember(ctx context.Context, token string, chatID int64, userID int) error {
+func (s *service) KickChatMember(ctx context.Context, chatID int64, userID int) error {
 	// https://core.telegram.org/bots/api#kickchatmember
 	const method = "kickChatMember"
-	var (
-		url  string = buildURL(token, method)
-		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","user_id":"%v"}`, chatID, userID))
-	)
-	return doRequest(url, body)
+
+	req := KickChatMemberBody{
+		ChatID: chatID,
+		UserID: userID,
+	}
+
+	reqJSON, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	return s.doRequest(ctx, s.buildURL(method), reqJSON)
 }
 
-func UnbanChatMember(ctx context.Context, token string, chatID int64, userID int) error {
+func (s *service) UnbanChatMember(ctx context.Context, chatID int64, userID int) error {
 	// https://core.telegram.org/bots/api#unbanchatmember
 	const method = "unbanChatMember"
-	var (
-		url  string = buildURL(token, method)
-		body []byte = []byte(fmt.Sprintf(`{"chat_id":"%v","user_id":"%v"}`, chatID, userID))
-	)
-	return doRequest(url, body)
+
+	req := UnbanChatMemberBody{
+		ChatID: chatID,
+		UserID: userID,
+	}
+
+	reqJSON, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	return s.doRequest(ctx, s.buildURL(method), reqJSON)
 }

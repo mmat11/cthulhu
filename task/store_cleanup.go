@@ -29,6 +29,7 @@ func StoreCleanupTask(
 	logger log.Logger,
 	config bot.Config,
 	store store.Service,
+	tg telegram.Service,
 	args bot.TaskArgs) func() {
 	return func() {
 		level.Info(logger).Log("msg", "running task")
