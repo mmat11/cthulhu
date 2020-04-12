@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"text/template"
 
@@ -37,16 +38,16 @@ func WelcomeMessageTask(
 	logger log.Logger,
 	config bot.Config,
 	store store.Service,
+	tg telegram.Service,
 	args bot.TaskArgs) func() {
 	return func() {
 		level.Info(logger).Log("msg", "running task")
 
 		var (
-			newUsersFromUpdates []string
-			newUsers            []string
-			taskConfigs         map[string]taskConfig = make(map[string]taskConfig)
-			tpl                 string
-			tplData             tmplData
+			newUsersFromUpdates, newUsers []string
+			taskConfigs                   map[string]taskConfig = make(map[string]taskConfig)
+			tpl                           string
+			tplData                       tmplData
 		)
 
 		for _, arg := range args {
@@ -66,7 +67,6 @@ func WelcomeMessageTask(
 			}
 
 			newUsersFromUpdates = getNewUsers(ctx, store, groupID)
-
 			usersAlreadyProcessed, err := getUsersProcessed(ctx, store, groupID)
 			if err != nil {
 				level.Error(logger).Log("msg", "error while getting processed users", "err", err)
@@ -98,8 +98,9 @@ func WelcomeMessageTask(
 				level.Error(logger).Log("msg", "failed to process template", "err", err)
 				continue
 			}
-			telegram.SendMessage(ctx, string(config.Bot.Token), int64FromStr(groupID), message)
+			tg.SendMessage(ctx, int64FromStr(groupID), message)
 			setUsersProcessed(ctx, store, groupID, newUsers)
+			newUsers = []string{}
 		}
 	}
 }
@@ -143,18 +144,16 @@ func setUsersProcessed(ctx context.Context, store store.Service, groupID string,
 }
 
 func getNewUsers(ctx context.Context, store store.Service, groupID string) []string {
-	var (
-		newUsers   []string
-		userWithAt string
-	)
+	var newUsers []string
 
 	for _, v := range store.GetAll(ctx) {
 		if u, ok := v.(*telegram.Update); ok {
 			if u.Message.Chat.ID == int64FromStr(groupID) {
 				if u.Message.NewChatMembers != nil {
 					for _, user := range *u.Message.NewChatMembers {
-						userWithAt = "@" + user.UserName
-						newUsers = append(newUsers, userWithAt)
+						if user.UserName != "" {
+							newUsers = append(newUsers, fmt.Sprintf("@%s", user.UserName))
+						}
 					}
 				}
 

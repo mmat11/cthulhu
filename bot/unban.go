@@ -34,9 +34,9 @@ func (s *service) handleUnban(ctx context.Context, updateReq *telegram.Update) e
 		level.Info(s.Logger).Log("msg", "not enough privileges")
 		return nil
 	}
-	if err := telegram.UnbanChatMember(ctx, string(s.GetToken()), chatID, userID); err != nil {
+	if err := s.Telegram.UnbanChatMember(ctx, chatID, userID); err != nil {
 		return err
 	}
-	telegram.SendMessage(ctx, string(s.GetToken()), chatID, fmt.Sprintf("user %s unbanned", updateReq.Message.ReplyToMessage.From.UserName))
+	s.Telegram.SendMessage(ctx, chatID, fmt.Sprintf("user %s unbanned", updateReq.Message.ReplyToMessage.From.UserName))
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 
 	"cthulhu/bot"
 	"cthulhu/store"
+	"cthulhu/telegram"
 )
 
 type Task func(
@@ -14,6 +15,7 @@ type Task func(
 	logger log.Logger,
 	config bot.Config,
 	store store.Service,
+	tg telegram.Service,
 	args bot.TaskArgs,
 ) func()
 

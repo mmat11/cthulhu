@@ -19,6 +19,7 @@ bot:
               - 797091005  # @pr0metherion
               - 40323575   # @lucacavallaro
               - 82046673   # @ugolandini
+              - 647357073  # @sakulsuvarn
       - group:
           id: -1001476422781
           url: t.me/kubernetes_it
@@ -38,6 +39,7 @@ bot:
               - 43120899   # @mirioo
               - 40323575   # @lucacavallaro
               - 82046673   # @ugolandini
+              - 647357073  # @sakulsuvarn
       - group:
           id: -1001141557431
           url: t.me/golangita
@@ -57,6 +59,7 @@ bot:
               - 43120899   # @mirioo
               - 797091005  # @pr0metherion
               - 82046673   # @ugolandini
+              - 647357073  # @sakulsuvarn
       - group:
           id: -1001271237061
           url: t.me/kafkastreaming
@@ -65,7 +68,8 @@ bot:
             - kafka
           admin:
             ids:
-              - 82046673  # @ugolandini
+              - 82046673   # @ugolandini
+              - 647357073  # @sakulsuvarn
             permissions:
               - ban
               - unban

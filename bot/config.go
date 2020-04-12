@@ -2,11 +2,13 @@ package bot
 
 type Token string
 
+type TaskArg struct {
+	Name  string `yaml:"name"`
+	Value string `yaml:"value"`
+}
+
 type TaskArgs []struct {
-	Arg struct {
-		Name  string `yaml:"name"`
-		Value string `yaml:"value"`
-	} `yaml:"arg"`
+	Arg TaskArg `yaml:"arg"`
 }
 
 type Config struct {

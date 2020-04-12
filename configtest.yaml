@@ -1,0 +1,63 @@
+bot:
+  access_control:
+    groups:
+      - group:
+          id: -1001206134473
+          url: t.me/cthulhutest1
+          crosspost_tags:
+            - test1
+          admin:
+            ids:
+              - 131000337  # @mmat11
+            permissions:
+              - ban
+              - unban
+              - broadcast
+      - group:
+          id: -1001326675343
+          url: t.me/cthulhutest2
+          crosspost_tags:
+            - test2
+          admin:
+            ids:
+              - 131000337  # @mmat11
+            permissions:
+              - ban
+              - unban
+              - broadcast
+      - group:
+          id: -1001291174532
+          url: t.me/cthulhutest3
+          crosspost_tags:
+            - test3
+          admin:
+            ids:
+              - 131000337  # @mmat11
+            permissions:
+              - ban
+              - unban
+              - broadcast
+  tasks:
+    - task:
+        name: StoreCleanup
+        cron: '@every 30s'
+        args:
+          - arg:
+              name: retention
+              value: 1800
+    - task:
+        name: WelcomeMessage
+        cron: '@every 10s'
+        args:
+          - arg:
+              name: 1Cfg
+              value: |
+                group_id: -1001206134473
+                message_template_single: 'welcome (single) {{.NewUsers}} in test group 1'
+                message_template_multiple: 'welcome (multiple) {{.NewUsers}} in test group 1'
+          - arg:
+              name: 2Cfg
+              value: |
+                group_id: -1001326675343
+                message_template_single: 'welcome (single) {{.NewUsers}} in test group 2'
+                message_template_multiple: 'welcome (multiple) {{.NewUsers}} in test group 2'

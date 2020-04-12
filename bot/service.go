@@ -19,16 +19,18 @@ type Service interface {
 }
 
 type service struct {
-	Logger log.Logger
-	Config Config
-	Store  store.Service
+	Logger   log.Logger
+	Config   Config
+	Store    store.Service
+	Telegram telegram.Service
 }
 
-func NewService(logger log.Logger, config Config, storeService store.Service) *service {
+func NewService(logger log.Logger, config Config, storeService store.Service, telegramService telegram.Service) *service {
 	return &service{
-		Logger: logger,
-		Config: config,
-		Store:  storeService,
+		Logger:   logger,
+		Config:   config,
+		Store:    storeService,
+		Telegram: telegramService,
 	}
 }
 
@@ -56,7 +58,7 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		level.Info(s.Logger).Log("msg", "received new command", "command", command)
 		switch command {
 		case pingCommand:
-			return telegram.SendMessage(ctx, string(s.GetToken()), updateReq.Message.Chat.ID, "pong")
+			return s.Telegram.SendMessage(ctx, updateReq.Message.Chat.ID, "pong")
 		case banCommand:
 			return s.handleBan(ctx, updateReq)
 		case unbanCommand:
@@ -86,7 +88,7 @@ func (s *service) handleNewUsers(ctx context.Context, updateReq *telegram.Update
 		if g.Group.ID == originID {
 			if g.Group.WelcomeMessage != "" {
 				for range *updateReq.Message.NewChatMembers {
-					telegram.Reply(ctx, string(s.GetToken()), g.Group.ID, g.Group.WelcomeMessage, updateReq.Message.MessageID)
+					s.Telegram.Reply(ctx, g.Group.ID, g.Group.WelcomeMessage, updateReq.Message.MessageID)
 				}
 			}
 		}
