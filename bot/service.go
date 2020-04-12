@@ -71,10 +71,10 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 }
 
 func (s *service) checkOrigin(ctx context.Context, updateReq *telegram.Update) bool {
-	var originID int64 = updateReq.Message.Chat.ID
+	var chatID int64 = updateReq.Message.Chat.ID
 
 	for _, g := range s.Config.Bot.AccessControl.Groups {
-		if g.Group.ID == originID {
+		if g.Group.ID == chatID {
 			return true
 		}
 	}
@@ -82,10 +82,10 @@ func (s *service) checkOrigin(ctx context.Context, updateReq *telegram.Update) b
 }
 
 func (s *service) handleNewUsers(ctx context.Context, updateReq *telegram.Update) {
-	var originID int64 = updateReq.Message.Chat.ID
+	var chatID int64 = updateReq.Message.Chat.ID
 
 	for _, g := range s.Config.Bot.AccessControl.Groups {
-		if g.Group.ID == originID {
+		if g.Group.ID == chatID {
 			if g.Group.WelcomeMessage != "" {
 				for range *updateReq.Message.NewChatMembers {
 					s.Telegram.Reply(ctx, g.Group.ID, g.Group.WelcomeMessage, updateReq.Message.MessageID)
