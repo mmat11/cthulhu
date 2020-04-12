@@ -21,6 +21,7 @@ func (s *service) handleBan(ctx context.Context, updateReq *telegram.Update) err
 		chatID   = updateReq.Message.Chat.ID
 		authorID = updateReq.Message.From.ID
 		userID   = updateReq.Message.ReplyToMessage.From.ID
+		userName = telegram.GetUserName(*updateReq.Message.ReplyToMessage.From)
 	)
 
 	level.Info(s.Logger).Log(
@@ -28,6 +29,7 @@ func (s *service) handleBan(ctx context.Context, updateReq *telegram.Update) err
 		"chat_id", chatID,
 		"author_id", authorID,
 		"user_id", userID,
+		"user_name", userName,
 	)
 
 	if !s.Config.hasPermissions(chatID, authorID, banCommand) {
@@ -37,6 +39,6 @@ func (s *service) handleBan(ctx context.Context, updateReq *telegram.Update) err
 	if err := s.Telegram.KickChatMember(ctx, chatID, userID); err != nil {
 		return err
 	}
-	s.Telegram.SendMessage(ctx, chatID, fmt.Sprintf("user %s banned", updateReq.Message.ReplyToMessage.From.UserName))
+	s.Telegram.SendMessage(ctx, chatID, fmt.Sprintf("user %s banned", userName))
 	return nil
 }

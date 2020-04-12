@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"text/template"
 
@@ -151,9 +150,7 @@ func getNewUsers(ctx context.Context, store store.Service, groupID string) []str
 			if u.Message.Chat.ID == int64FromStr(groupID) {
 				if u.Message.NewChatMembers != nil {
 					for _, user := range *u.Message.NewChatMembers {
-						if user.UserName != "" {
-							newUsers = append(newUsers, fmt.Sprintf("@%s", user.UserName))
-						}
+						newUsers = append(newUsers, telegram.GetUserName(user))
 					}
 				}
 
