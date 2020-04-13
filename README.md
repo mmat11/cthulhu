@@ -37,6 +37,8 @@ Available commands/functions:
 
     _message_ will be sent in all groups except the current one.
 
+Resources usage can be seen here (guest/guest): http://116.203.185.109:3000/d/rYdddlPWk/node-exporter-cthulhu?orgId=1
+
 ## Contributing
 
 TBD
