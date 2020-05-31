@@ -48,7 +48,7 @@ bot:
             - golang
           admin:
             ids:
-              - 40323575  # @lucacavallaro
+              - 40323575   # @lucacavallaro
             permissions:
               - ban
               - unban
@@ -80,6 +80,24 @@ bot:
               - 43120899   # @mirioo
               - 797091005  # @pr0metherion
               - 40323575   # @lucacavallaro
+      - group:
+          id: -1001419379378
+          url: t.me/vienialbar
+          crosspost_tags:
+            - ot
+            - offtopic
+          admin:
+            ids:
+              - 131000337  # @mmat11
+              - 43120899   # @mirioo
+              - 797091005  # @pr0metherion
+              - 40323575   # @lucacavallaro
+              - 82046673   # @ugolandini
+              - 647357073  # @sakulsuvarn
+            permissions:
+              - ban
+              - unban
+              - broadcast
   tasks:
     - task:
         name: StoreCleanup
@@ -104,3 +122,9 @@ bot:
                 group_id: -1001150551096
                 message_template_single: 'Benvenuto {{.NewUsers}}!'
                 message_template_multiple: 'Benvenuti {{.NewUsers}}!'
+          - arg:
+              name: barettoCfg
+              value: |
+                group_id: -1001419379378
+                message_template_single: 'Ciao {{.NewUsers}}. ☕?'
+                message_template_multiple: 'Ciao {{.NewUsers}}. ☕?'
