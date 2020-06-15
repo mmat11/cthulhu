@@ -13,15 +13,16 @@ import (
 
 func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
 	var (
-		hashTags       map[string]struct{} = make(map[string]struct{})
-		chatID         int64               = updateReq.Message.Chat.ID
-		authorID       int                 = updateReq.Message.From.ID
-		chatName, text string
-		quoting        bool
-		fwdText        string = "your message has been forwarded to"
+		hashTags             map[string]struct{} = make(map[string]struct{})
+		chatID               int64               = updateReq.Message.Chat.ID
+		authorID             int                 = updateReq.Message.From.ID
+		chatName, text       string
+		isCrosspost, quoting bool
+		fwdText              string = "your message has been forwarded to"
 	)
 
 	if !s.Config.isMod(authorID) {
+		level.Info(s.Logger).Log("msg", "user is not mod", "chat_id", chatID, "author", authorID)
 		return nil
 	}
 
@@ -58,6 +59,7 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 			if _, ok := hashTags[hashTag]; ok {
 				if g.Group.ID != chatID {
 					level.Info(s.Logger).Log("msg", "crossposting", "text", text, "to", g.Group.ID, "from", chatName)
+					isCrosspost = true
 					s.Telegram.SendMessage(ctx, g.Group.ID, text)
 					if quoting {
 						fwdText = fmt.Sprintf("%s %s,", fwdText, g.Group.URL)
@@ -67,7 +69,7 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		}
 	}
 
-	if quoting {
+	if quoting && isCrosspost {
 		if err := s.Telegram.DeleteMessage(ctx, chatID, updateReq.Message.MessageID); err != nil {
 			level.Info(s.Logger).Log("msg", "crosspost delete", "err", err)
 		}
