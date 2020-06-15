@@ -64,19 +64,6 @@ func (c *Config) hasPermissions(chatID int64, userID int, operation string) bool
 	return userIDFound && operationFound
 }
 
-func (c *Config) isAdmin(chatID int64, userID int) bool {
-	for _, g := range c.Bot.AccessControl.Groups {
-		if g.Group.ID == chatID {
-			for _, id := range g.Group.Admin.IDs {
-				if id == userID {
-					return true
-				}
-			}
-		}
-	}
-	return false
-}
-
 func (c *Config) isMod(userID int) bool {
 	for _, id := range c.Bot.AccessControl.Mods.IDs {
 		if id == userID {
