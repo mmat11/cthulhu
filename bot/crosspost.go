@@ -12,11 +12,11 @@ import (
 
 func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Update) error {
 	var (
-		hashTags map[string]struct{} = make(map[string]struct{})
-		chatID   int64               = updateReq.Message.Chat.ID
-		authorID int                 = updateReq.Message.From.ID
-		chatName string
-		text     string
+		hashTags       map[string]struct{} = make(map[string]struct{})
+		chatID         int64               = updateReq.Message.Chat.ID
+		authorID       int                 = updateReq.Message.From.ID
+		chatName, text string
+		quoting        bool
 	)
 
 	if !s.Config.isMod(authorID) {
@@ -31,9 +31,11 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		text = fmt.Sprintf("%s >", chatName)
 	}
 
+	quoting = false
 	if updateReq.Message.ReplyToMessage == nil {
 		text += fmt.Sprintf(" %s", updateReq.Message.Text)
 	} else {
+		quoting = true
 		text += fmt.Sprintf(" %s", updateReq.Message.ReplyToMessage.Text)
 	}
 
@@ -54,6 +56,10 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 			if _, ok := hashTags[hashTag]; ok {
 				if g.Group.ID != chatID {
 					level.Info(s.Logger).Log("msg", "crossposting", "text", text, "to", g.Group.ID, "from", chatName)
+					if quoting {
+						s.Telegram.Reply(ctx, g.Group.ID, fmt.Sprintf("your message has been forwarded to %s", g.Group.URL), updateReq.Message.ReplyToMessage.MessageID)
+						s.Telegram.DeleteMessage(ctx, g.Group.ID, updateReq.Message.MessageID)
+					}
 					s.Telegram.SendMessage(ctx, g.Group.ID, text)
 				}
 			}
