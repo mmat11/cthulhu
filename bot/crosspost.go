@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"fmt"
+	"strings"
 	"unicode/utf16"
 
 	"github.com/go-kit/kit/log/level"
@@ -17,6 +18,7 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		authorID       int                 = updateReq.Message.From.ID
 		chatName, text string
 		quoting        bool
+		fwdText        string = "your message has been forwarded to"
 	)
 
 	if !s.Config.isMod(authorID) {
@@ -56,13 +58,21 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 			if _, ok := hashTags[hashTag]; ok {
 				if g.Group.ID != chatID {
 					level.Info(s.Logger).Log("msg", "crossposting", "text", text, "to", g.Group.ID, "from", chatName)
-					if quoting {
-						s.Telegram.Reply(ctx, g.Group.ID, fmt.Sprintf("your message has been forwarded to %s", g.Group.URL), updateReq.Message.ReplyToMessage.MessageID)
-						s.Telegram.DeleteMessage(ctx, g.Group.ID, updateReq.Message.MessageID)
-					}
 					s.Telegram.SendMessage(ctx, g.Group.ID, text)
+					if quoting {
+						fwdText = fmt.Sprintf("%s %s,", fwdText, g.Group.URL)
+					}
 				}
 			}
+		}
+	}
+
+	if quoting {
+		if err := s.Telegram.DeleteMessage(ctx, chatID, updateReq.Message.MessageID); err != nil {
+			level.Info(s.Logger).Log("msg", "crosspost delete", "err", err)
+		}
+		if err := s.Telegram.Reply(ctx, chatID, strings.TrimRight(fwdText, ","), updateReq.Message.ReplyToMessage.MessageID); err != nil {
+			level.Info(s.Logger).Log("msg", "crosspost reply", "err", err)
 		}
 	}
 	return nil
