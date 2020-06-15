@@ -19,7 +19,7 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		text     string
 	)
 
-	if !s.Config.isModerator(chatID, authorID) && !s.Config.isAdmin(chatID, authorID) {
+	if !s.Config.isMod(authorID) {
 		return nil
 	}
 

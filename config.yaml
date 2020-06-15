@@ -1,11 +1,22 @@
 bot:
   access_control:
+    mods:
+      ids:
+        - 131000337  # @mmat11
+        - 43120899   # @mirioo
+        - 797091005  # @pr0metherion
+        - 40323575   # @lucacavallaro
+        - 82046673   # @ugolandini
+        - 647357073  # @sakulsuvarn
+        - 14927163   # @enrico204
+        - 347743167  # @albus983
     groups:
       - group:
           id: -1001150551096
           url: t.me/devopsitalia
           crosspost_tags:
             - devops
+            - ops
           admin:
             ids:
               - 131000337  # @mmat11
@@ -14,12 +25,6 @@ bot:
               - ban
               - unban
               - broadcast
-          moderator:
-            ids:
-              - 797091005  # @pr0metherion
-              - 40323575   # @lucacavallaro
-              - 82046673   # @ugolandini
-              - 647357073  # @sakulsuvarn
       - group:
           id: -1001476422781
           url: t.me/kubernetes_it
@@ -33,13 +38,6 @@ bot:
               - ban
               - unban
               - broadcast
-          moderator:
-            ids:
-              - 131000337  # @mmat11
-              - 43120899   # @mirioo
-              - 40323575   # @lucacavallaro
-              - 82046673   # @ugolandini
-              - 647357073  # @sakulsuvarn
       - group:
           id: -1001141557431
           url: t.me/golangita
@@ -53,13 +51,6 @@ bot:
               - ban
               - unban
               - broadcast
-          moderator:
-            ids:
-              - 131000337  # @mmat11
-              - 43120899   # @mirioo
-              - 797091005  # @pr0metherion
-              - 82046673   # @ugolandini
-              - 647357073  # @sakulsuvarn
       - group:
           id: -1001271237061
           url: t.me/kafkastreaming
@@ -74,12 +65,20 @@ bot:
               - ban
               - unban
               - broadcast
-          moderator:
+      - group:
+          id: -1001329456697
+          url: t.me/Sistemisti_Italiani
+          crosspost_tags:
+            - sys
+            - ops
+          admin:
             ids:
-              - 131000337  # @mmat11
-              - 43120899   # @mirioo
-              - 797091005  # @pr0metherion
-              - 40323575   # @lucacavallaro
+              - 14927163   # @enrico204
+              - 347743167  # @albus983
+            permissions:
+              - ban
+              - unban
+              - broadcast
       - group:
           id: -1001419379378
           url: t.me/vienialbar
@@ -94,6 +93,8 @@ bot:
               - 40323575   # @lucacavallaro
               - 82046673   # @ugolandini
               - 647357073  # @sakulsuvarn
+              - 14927163   # @enrico204
+              - 347743167  # @albus983
             permissions:
               - ban
               - unban
