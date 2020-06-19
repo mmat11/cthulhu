@@ -17,6 +17,7 @@ type Service interface {
 	Reply(ctx context.Context, chatID int64, text string, messageID int) error
 	KickChatMember(ctx context.Context, chatID int64, userID int) error
 	UnbanChatMember(ctx context.Context, chatID int64, userID int) error
+	DeleteMessage(ctx context.Context, chatID int64, messageID int) error
 }
 
 type service struct {
@@ -117,6 +118,22 @@ func (s *service) UnbanChatMember(ctx context.Context, chatID int64, userID int)
 	reqJSON, err := json.Marshal(map[string]interface{}{
 		"chat_id": chatID,
 		"user_id": userID,
+	})
+	if err != nil {
+		level.Error(s.Logger).Log("msg", "failed marshalling json", "err", err)
+		return err
+	}
+
+	return s.doRequest(ctx, s.buildURL(method), reqJSON)
+}
+
+func (s *service) DeleteMessage(ctx context.Context, chatID int64, messageID int) error {
+	// https://core.telegram.org/bots/api#deletemessage
+	const method = "deleteMessage"
+
+	reqJSON, err := json.Marshal(map[string]interface{}{
+		"chat_id":    chatID,
+		"message_id": messageID,
 	})
 	if err != nil {
 		level.Error(s.Logger).Log("msg", "failed marshalling json", "err", err)

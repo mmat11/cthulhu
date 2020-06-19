@@ -1,5 +1,8 @@
 bot:
   access_control:
+    mods:
+      ids:
+        - 131000337  # @mmat11
     groups:
       - group:
           id: -1001206134473

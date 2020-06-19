@@ -15,6 +15,9 @@ type Config struct {
 	Bot struct {
 		Token         Token
 		AccessControl struct {
+			Mods struct {
+				IDs []int `yaml:"ids"`
+			} `yaml:"mods"`
 			Groups []struct {
 				Group struct {
 					ID             int64    `yaml:"id"`
@@ -25,10 +28,6 @@ type Config struct {
 						IDs         []int    `yaml:"ids"`
 						Permissions []string `yaml:"permissions"`
 					} `yaml:"admin"`
-					Moderator struct {
-						IDs         []int    `yaml:"ids"`
-						Permissions []string `yaml:"permissions"`
-					} `yaml:"moderator"`
 				} `yaml:"group"`
 			} `yaml:"groups"`
 		} `yaml:"access_control"`
@@ -65,27 +64,10 @@ func (c *Config) hasPermissions(chatID int64, userID int, operation string) bool
 	return userIDFound && operationFound
 }
 
-func (c *Config) isAdmin(chatID int64, userID int) bool {
-	for _, g := range c.Bot.AccessControl.Groups {
-		if g.Group.ID == chatID {
-			for _, id := range g.Group.Admin.IDs {
-				if id == userID {
-					return true
-				}
-			}
-		}
-	}
-	return false
-}
-
-func (c *Config) isModerator(chatID int64, userID int) bool {
-	for _, g := range c.Bot.AccessControl.Groups {
-		if g.Group.ID == chatID {
-			for _, id := range g.Group.Moderator.IDs {
-				if id == userID {
-					return true
-				}
-			}
+func (c *Config) isMod(userID int) bool {
+	for _, id := range c.Bot.AccessControl.Mods.IDs {
+		if id == userID {
+			return true
 		}
 	}
 	return false

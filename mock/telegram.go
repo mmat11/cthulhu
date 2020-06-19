@@ -33,6 +33,20 @@ func (m *TelegramService) EXPECT() *TelegramServiceMockRecorder {
 	return m.recorder
 }
 
+// DeleteMessage mocks base method
+func (m *TelegramService) DeleteMessage(arg0 context.Context, arg1 int64, arg2 int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteMessage", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteMessage indicates an expected call of DeleteMessage
+func (mr *TelegramServiceMockRecorder) DeleteMessage(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMessage", reflect.TypeOf((*TelegramService)(nil).DeleteMessage), arg0, arg1, arg2)
+}
+
 // KickChatMember mocks base method
 func (m *TelegramService) KickChatMember(arg0 context.Context, arg1 int64, arg2 int) error {
 	m.ctrl.T.Helper()
