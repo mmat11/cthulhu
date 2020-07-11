@@ -33,8 +33,20 @@ func (m *StoreService) EXPECT() *StoreServiceMockRecorder {
 	return m.recorder
 }
 
+// Close mocks base method
+func (m *StoreService) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close
+func (mr *StoreServiceMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*StoreService)(nil).Close))
+}
+
 // Create mocks base method
-func (m *StoreService) Create(arg0 context.Context, arg1 string, arg2 interface{}) error {
+func (m *StoreService) Create(arg0 context.Context, arg1 string, arg2 []byte) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
@@ -48,10 +60,10 @@ func (mr *StoreServiceMockRecorder) Create(arg0, arg1, arg2 interface{}) *gomock
 }
 
 // Delete mocks base method
-func (m *StoreService) Delete(arg0 context.Context, arg1 string) (interface{}, error) {
+func (m *StoreService) Delete(arg0 context.Context, arg1 string) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
-	ret0, _ := ret[0].(interface{})
+	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -63,10 +75,10 @@ func (mr *StoreServiceMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call 
 }
 
 // GetAll mocks base method
-func (m *StoreService) GetAll(arg0 context.Context) map[string]interface{} {
+func (m *StoreService) GetAll(arg0 context.Context) map[string][]byte {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", arg0)
-	ret0, _ := ret[0].(map[string]interface{})
+	ret0, _ := ret[0].(map[string][]byte)
 	return ret0
 }
 
@@ -77,10 +89,10 @@ func (mr *StoreServiceMockRecorder) GetAll(arg0 interface{}) *gomock.Call {
 }
 
 // Read mocks base method
-func (m *StoreService) Read(arg0 context.Context, arg1 string) (interface{}, error) {
+func (m *StoreService) Read(arg0 context.Context, arg1 string) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read", arg0, arg1)
-	ret0, _ := ret[0].(interface{})
+	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -92,7 +104,7 @@ func (mr *StoreServiceMockRecorder) Read(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // Update mocks base method
-func (m *StoreService) Update(arg0 context.Context, arg1 string, arg2 interface{}) error {
+func (m *StoreService) Update(arg0 context.Context, arg1 string, arg2 []byte) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)

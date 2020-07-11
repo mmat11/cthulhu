@@ -22,7 +22,6 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 	)
 
 	if !s.Config.isMod(authorID) {
-		level.Info(s.Logger).Log("msg", "user is not mod", "chat_id", chatID, "author", authorID)
 		return nil
 	}
 

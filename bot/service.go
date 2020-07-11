@@ -48,7 +48,7 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		return nil
 	}
 
-	s.Store.Create(ctx, strconv.Itoa(updateReq.UpdateID), updateReq)
+	s.Store.Create(ctx, strconv.Itoa(updateReq.UpdateID), telegram.MarshalUpdate(updateReq))
 
 	if updateReq.Message.NewChatMembers != nil {
 		s.handleNewUsers(ctx, updateReq)

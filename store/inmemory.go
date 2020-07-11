@@ -8,17 +8,20 @@ import (
 	"github.com/go-kit/kit/log/level"
 )
 
-type service struct {
-	KV     map[string]interface{}
+type inMemory struct {
+	KV     map[string][]byte
 	mu     sync.Mutex
 	Logger log.Logger
 }
 
-func NewInMemory(logger log.Logger) *service {
-	return &service{KV: make(map[string]interface{}), Logger: logger}
+func NewInMemory(logger log.Logger) *inMemory {
+	return &inMemory{
+		KV:     make(map[string][]byte),
+		Logger: logger,
+	}
 }
 
-func (s *service) Create(ctx context.Context, key string, value interface{}) error {
+func (s *inMemory) Create(ctx context.Context, key string, value []byte) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -31,14 +34,14 @@ func (s *service) Create(ctx context.Context, key string, value interface{}) err
 	return nil
 }
 
-func (s *service) Read(ctx context.Context, key string) (interface{}, error) {
+func (s *inMemory) Read(ctx context.Context, key string) ([]byte, error) {
 	if v, ok := s.KV[key]; ok {
 		return v, nil
 	}
 	return nil, ErrKeyNotFound
 }
 
-func (s *service) Update(ctx context.Context, key string, value interface{}) error {
+func (s *inMemory) Update(ctx context.Context, key string, value []byte) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -51,8 +54,8 @@ func (s *service) Update(ctx context.Context, key string, value interface{}) err
 	return ErrKeyNotFound
 }
 
-func (s *service) Delete(ctx context.Context, key string) (interface{}, error) {
-	var v interface{}
+func (s *inMemory) Delete(ctx context.Context, key string) ([]byte, error) {
+	var v []byte
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -67,8 +70,11 @@ func (s *service) Delete(ctx context.Context, key string) (interface{}, error) {
 	return v, nil
 }
 
-func (s *service) GetAll(ctx context.Context) map[string]interface{} {
+func (s *inMemory) GetAll(ctx context.Context) map[string][]byte {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.KV
+}
+
+func (s *inMemory) Close() {
 }

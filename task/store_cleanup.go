@@ -42,7 +42,8 @@ func StoreCleanupTask(
 			}
 		}
 		for k, v := range store.GetAll(ctx) {
-			if u, ok := v.(*telegram.Update); ok {
+			u, err := telegram.UnmarshalUpdate(v)
+			if err == nil {
 				if u.Message.Date < int(time.Now().Unix())-retention {
 					if _, err := store.Delete(ctx, k); err != nil {
 						level.Error(logger).Log("msg", "error deleting key", "key", k, "err", err)

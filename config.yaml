@@ -1,4 +1,6 @@
 bot:
+  database:
+    type: badger  # alternatives: inmemory
   access_control:
     mods:
       ids:
@@ -102,11 +104,11 @@ bot:
   tasks:
     - task:
         name: StoreCleanup
-        cron: '@every 5m'
+        cron: '@every 15m'
         args:
           - arg:
               name: retention
-              value: 86400  # 24h
+              value: 604800  # 1 week
     - task:
         name: WelcomeMessage
         cron: '05 8,12,16,20 * * *'
