@@ -12,12 +12,14 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/robfig/cron/v3"
 	"gopkg.in/yaml.v2"
 
 	"cthulhu/bot"
 	"cthulhu/cmd"
 	"cthulhu/endpoint"
+	"cthulhu/metrics"
 	"cthulhu/store"
 	"cthulhu/task"
 	"cthulhu/telegram"
@@ -29,6 +31,9 @@ const (
 	listenAddress = ":443"
 	certFile      = "./bot.pem"
 	keyFile       = "./server.key"
+
+	// prometheus exporter
+	metricsListenAddress = ":2112"
 
 	// bot
 	configFile = "config.yaml"
@@ -46,6 +51,7 @@ func main() {
 	var (
 		logger          log.Logger       = cmd.MakeLogger()
 		config          bot.Config       = readConfig(logger, configFile, botToken)
+		metricsService  metrics.Service  = metrics.NewService()
 		telegramService telegram.Service = telegram.NewService(logger, apiEndpoint, string(botToken))
 		storeService    store.Service
 		botService      bot.Service
@@ -65,7 +71,7 @@ func main() {
 		storeService = store.NewInMemory(logger)
 	}
 
-	botService = bot.NewService(logger, config, storeService, telegramService)
+	botService = bot.NewService(logger, config, storeService, telegramService, metricsService)
 	endpointSet = endpoint.NewSet(botService)
 	httpHandler = transport.MakeHTTPHandler(
 		botService,
@@ -87,18 +93,40 @@ func main() {
 		Handler: httpHandler,
 	}
 
+	promexp := &http.Server{
+		Addr:    metricsListenAddress,
+		Handler: promhttp.Handler(),
+	}
+
+	// webhook handler
 	go func() {
+		level.Info(logger).Log("msg", "starting server", "addr", listenAddress)
 		if err := s.ListenAndServeTLS(certFile, keyFile); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 	}()
 
+	// prometheus metrics
+	go func() {
+		level.Info(logger).Log("msg", "starting metrics server", "addr", metricsListenAddress)
+		if err := promexp.ListenAndServe(); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}()
+
 	<-c
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
 	storeService.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	if err := promexp.Shutdown(ctx); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	if err := s.Shutdown(ctx); err != nil {
 		fmt.Println(err)
