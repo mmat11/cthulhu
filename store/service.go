@@ -11,9 +11,10 @@ var (
 )
 
 type Service interface {
-	Create(ctx context.Context, key string, value interface{}) error
-	Read(ctx context.Context, key string) (interface{}, error)
-	Update(ctx context.Context, key string, value interface{}) error
-	Delete(ctx context.Context, key string) (interface{}, error)
-	GetAll(ctx context.Context) map[string]interface{}
+	Create(ctx context.Context, key string, value []byte) error
+	Read(ctx context.Context, key string) ([]byte, error)
+	Update(ctx context.Context, key string, value []byte) error
+	Delete(ctx context.Context, key string) ([]byte, error)
+	GetAll(ctx context.Context) map[string][]byte
+	Close()
 }

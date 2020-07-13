@@ -13,7 +13,10 @@ type TaskArgs []struct {
 
 type Config struct {
 	Bot struct {
-		Token         Token
+		Token    Token
+		Database struct {
+			Type string `yaml:"type"`
+		} `yaml:"database"`
 		AccessControl struct {
 			Mods struct {
 				IDs []int `yaml:"ids"`

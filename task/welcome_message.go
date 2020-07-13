@@ -3,7 +3,6 @@ package task
 import (
 	"bytes"
 	"context"
-	"errors"
 	"strings"
 	"text/template"
 
@@ -25,8 +24,9 @@ type (
 	tmplData   struct {
 		NewUsers string
 	}
-	welcomeMessageTaskContext struct {
-		UsersProcessed []string
+	UserSet                   map[string]struct{}
+	WelcomeMessageTaskContext struct {
+		UsersProcessed UserSet
 	}
 )
 
@@ -43,10 +43,10 @@ func WelcomeMessageTask(
 		level.Info(logger).Log("msg", "running task")
 
 		var (
-			newUsersFromUpdates, newUsers []string
-			taskConfigs                   map[string]taskConfig = make(map[string]taskConfig)
-			tpl                           string
-			tplData                       tmplData
+			newUsers    UserSet               = make(UserSet)
+			taskConfigs map[string]taskConfig = make(map[string]taskConfig)
+			tpl         string
+			tplData     tmplData
 		)
 
 		for _, arg := range args {
@@ -65,20 +65,20 @@ func WelcomeMessageTask(
 				continue
 			}
 
-			newUsersFromUpdates = getNewUsers(ctx, store, groupID)
+			newUsers = getNewUsers(ctx, store, groupID)
 			usersAlreadyProcessed, err := getUsersProcessed(ctx, store, groupID)
 			if err != nil {
 				level.Error(logger).Log("msg", "error while getting processed users", "err", err)
 				continue
 			}
 
-			for _, u := range newUsersFromUpdates {
-				if _, ok := usersAlreadyProcessed[u]; !ok {
-					newUsers = append(newUsers, u)
+			for k := range newUsers {
+				if _, ok := usersAlreadyProcessed[k]; ok {
+					delete(newUsers, k)
 				}
 			}
 
-			tplData = tmplData{NewUsers: strings.Join(newUsers, ", ")}
+			tplData = tmplData{NewUsers: newUsers.String()}
 			switch len(newUsers) {
 			case 0:
 				level.Info(logger).Log("msg", "0 new users since the last run", "group_id", groupID)
@@ -98,62 +98,64 @@ func WelcomeMessageTask(
 				continue
 			}
 			tg.SendMessage(ctx, int64FromStr(groupID), message)
-			setUsersProcessed(ctx, store, groupID, newUsers)
-			newUsers = []string{}
+			if err := setUsersProcessed(ctx, store, groupID, newUsers); err != nil {
+				level.Error(logger).Log("msg", "error while setting users processed", "err", err)
+			}
 		}
 	}
 }
 
-func getUsersProcessed(ctx context.Context, store store.Service, groupID string) (map[string]struct{}, error) {
-	var processed map[string]struct{} = make(map[string]struct{})
+func getUsersProcessed(ctx context.Context, store store.Service, groupID string) (UserSet, error) {
+	var processed UserSet = make(UserSet)
 
 	key := welcomeMessageTaskName + groupID
 
-	val, err := store.Read(ctx, key)
+	b, err := store.Read(ctx, key)
 	if err != nil {
 		// no context
 		return processed, nil
 	}
 
-	if taskContext, ok := val.(welcomeMessageTaskContext); ok {
-		for _, u := range taskContext.UsersProcessed {
-			processed[u] = struct{}{}
-		}
-		return processed, nil
+	c, err := UnmarshalWMTaskContext(b)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("unknown context format")
+
+	processed = c.UsersProcessed
+	return processed, nil
 }
 
-func setUsersProcessed(ctx context.Context, store store.Service, groupID string, newUsers []string) {
-	var taskContext welcomeMessageTaskContext
-
+func setUsersProcessed(ctx context.Context, store store.Service, groupID string, newUsers UserSet) error {
 	key := welcomeMessageTaskName + groupID
 
-	val, err := store.Read(ctx, key)
+	b, err := store.Read(ctx, key)
 	if err != nil {
 		// context needs to be created
-		taskContext = welcomeMessageTaskContext{UsersProcessed: newUsers}
-		store.Create(ctx, key, taskContext)
-		return
+		return store.Create(ctx, key, MarshalWMTaskContext(&WelcomeMessageTaskContext{UsersProcessed: newUsers}))
 	}
-	if taskContext, ok := val.(welcomeMessageTaskContext); ok {
-		taskContext.UsersProcessed = append(taskContext.UsersProcessed, newUsers...)
-		store.Update(ctx, key, taskContext)
+
+	c, err := UnmarshalWMTaskContext(b)
+	if err != nil {
+		return err
 	}
+
+	// merge new UserSet with existing UserSet in context
+	c.UsersProcessed.Merge(newUsers)
+	return store.Update(ctx, key, MarshalWMTaskContext(c))
 }
 
-func getNewUsers(ctx context.Context, store store.Service, groupID string) []string {
-	var newUsers []string
+func getNewUsers(ctx context.Context, store store.Service, groupID string) UserSet {
+	var newUsers UserSet = make(UserSet)
 
 	for _, v := range store.GetAll(ctx) {
-		if u, ok := v.(*telegram.Update); ok {
+		u, err := telegram.UnmarshalUpdate(v)
+		if err == nil {
 			if u.Message.Chat.ID == int64FromStr(groupID) {
 				if u.Message.NewChatMembers != nil {
 					for _, user := range *u.Message.NewChatMembers {
-						newUsers = append(newUsers, telegram.GetUserName(user))
+						newUsers[telegram.GetUserName(user)] = struct{}{}
 					}
 				}
-
 			}
 		}
 	}
@@ -184,4 +186,19 @@ func readArgValue(data string) (*taskConfig, error) {
 		return nil, err
 	}
 	return &cfg, nil
+}
+
+func (us UserSet) Merge(b UserSet) {
+	for k, v := range b {
+		us[k] = v
+	}
+}
+
+func (us UserSet) String() string {
+	var s strings.Builder
+	for k := range us {
+		s.WriteString(k)
+		s.WriteString(", ")
+	}
+	return strings.TrimRight(s.String(), ", ")
 }

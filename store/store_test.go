@@ -19,11 +19,11 @@ func TestCreateOk(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = &telegram.Update{
+		val = telegram.MarshalUpdate(&telegram.Update{
 			Message: &telegram.Message{
 				Text: "test",
 			},
-		}
+		})
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -44,11 +44,11 @@ func TestCreateAlreadyExists(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = &telegram.Update{
+		val = telegram.MarshalUpdate(&telegram.Update{
 			Message: &telegram.Message{
 				Text: "test",
 			},
-		}
+		})
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -78,11 +78,11 @@ func TestReadOk(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = &telegram.Update{
+		val = telegram.MarshalUpdate(&telegram.Update{
 			Message: &telegram.Message{
 				Text: "test",
 			},
-		}
+		})
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -136,16 +136,16 @@ func TestUpdateOk(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = &telegram.Update{
+		val = telegram.MarshalUpdate(&telegram.Update{
 			Message: &telegram.Message{
 				Text: "test",
 			},
-		}
-		newVal = &telegram.Update{
+		})
+		newVal = telegram.MarshalUpdate(&telegram.Update{
 			Message: &telegram.Message{
 				Text: "new",
 			},
-		}
+		})
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -185,11 +185,11 @@ func TestUpdateNotFound(t *testing.T) {
 	var (
 		ctx    = context.Background()
 		key    = "test"
-		newVal = &telegram.Update{
+		newVal = telegram.MarshalUpdate(&telegram.Update{
 			Message: &telegram.Message{
 				Text: "new",
 			},
-		}
+		})
 	)
 
 	svc := mock.NewStoreService(ctrl)
@@ -210,11 +210,11 @@ func TestDeleteOk(t *testing.T) {
 	var (
 		ctx = context.Background()
 		key = "test"
-		val = &telegram.Update{
+		val = telegram.MarshalUpdate(&telegram.Update{
 			Message: &telegram.Message{
 				Text: "test",
 			},
-		}
+		})
 	)
 
 	svc := mock.NewStoreService(ctrl)

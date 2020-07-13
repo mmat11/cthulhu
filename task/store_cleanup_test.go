@@ -27,17 +27,17 @@ func TestStoreCleanupTask(t *testing.T) {
 				},
 			},
 		}
-		allUpdates map[string]interface{} = map[string]interface{}{
-			"1": &telegram.Update{
+		allUpdates map[string][]byte = map[string][]byte{
+			"1": telegram.MarshalUpdate(&telegram.Update{
 				Message: &telegram.Message{
 					Date: 1000000,
 				},
-			},
-			"2": &telegram.Update{
+			}),
+			"2": telegram.MarshalUpdate(&telegram.Update{
 				Message: &telegram.Message{
 					Date: int(time.Now().Unix()),
 				},
-			},
+			}),
 		}
 	)
 

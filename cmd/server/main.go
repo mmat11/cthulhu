@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -34,22 +38,39 @@ const (
 )
 
 var (
-	botToken = bot.Token(os.Getenv("BOT_TOKEN"))
+	botToken   = bot.Token(os.Getenv("BOT_TOKEN"))
+	badgerPath = os.Getenv("BADGER_PATH")
 )
 
 func main() {
 	var (
 		logger          log.Logger       = cmd.MakeLogger()
 		config          bot.Config       = readConfig(logger, configFile, botToken)
-		storeService    store.Service    = store.NewInMemory(logger)
 		telegramService telegram.Service = telegram.NewService(logger, apiEndpoint, string(botToken))
-		botService      bot.Service      = bot.NewService(logger, config, storeService, telegramService)
-		endpointSet     *endpoint.Set    = endpoint.NewSet(botService)
-		httpHandler     http.Handler     = transport.MakeHTTPHandler(
-			botService,
-			*endpointSet,
-			logger,
-		)
+		storeService    store.Service
+		botService      bot.Service
+		endpointSet     *endpoint.Set
+		httpHandler     http.Handler
+	)
+
+	switch config.Bot.Database.Type {
+	case "badger":
+		s, err := store.NewBadger(logger, badgerPath)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		storeService = s
+	default:
+		storeService = store.NewInMemory(logger)
+	}
+
+	botService = bot.NewService(logger, config, storeService, telegramService)
+	endpointSet = endpoint.NewSet(botService)
+	httpHandler = transport.MakeHTTPHandler(
+		botService,
+		*endpointSet,
+		logger,
 	)
 
 	level.Info(logger).Log("msg", "start")
@@ -58,11 +79,29 @@ func main() {
 	level.Info(logger).Log("msg", "tasks registered", "tasks", task.Registry)
 	go registerTasks(logger, config, storeService, telegramService)
 
-	if err := http.ListenAndServeTLS(listenAddress, certFile, keyFile, httpHandler); err != nil {
-		level.Error(logger).Log(
-			"msg", "failed to start server",
-			"err", err,
-		)
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	s := &http.Server{
+		Addr:    listenAddress,
+		Handler: httpHandler,
+	}
+
+	go func() {
+		if err := s.ListenAndServeTLS(certFile, keyFile); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}()
+
+	<-c
+	storeService.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := s.Shutdown(ctx); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }
