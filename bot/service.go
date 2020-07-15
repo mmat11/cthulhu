@@ -3,10 +3,12 @@ package bot
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 
+	"cthulhu/metrics"
 	"cthulhu/store"
 	"cthulhu/telegram"
 )
@@ -23,14 +25,22 @@ type service struct {
 	Config   Config
 	Store    store.Service
 	Telegram telegram.Service
+	Metrics  metrics.Service
 }
 
-func NewService(logger log.Logger, config Config, storeService store.Service, telegramService telegram.Service) *service {
+func NewService(
+	logger log.Logger,
+	config Config,
+	storeService store.Service,
+	telegramService telegram.Service,
+	metricsService metrics.Service,
+) *service {
 	return &service{
 		Logger:   logger,
 		Config:   config,
 		Store:    storeService,
 		Telegram: telegramService,
+		Metrics:  metricsService,
 	}
 }
 
@@ -48,7 +58,16 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		return nil
 	}
 
-	s.Store.Create(ctx, strconv.Itoa(updateReq.UpdateID), telegram.MarshalUpdate(updateReq))
+	var startTime time.Time = time.Now()
+
+	if err := s.Store.Create(ctx, strconv.Itoa(updateReq.UpdateID), telegram.MarshalUpdate(updateReq)); err != nil {
+		return err
+	}
+
+	s.Metrics.IncUpdatesTotal(
+		telegram.GetChatName(*updateReq.Message.Chat),
+		telegram.GetUserName(*updateReq.Message.From),
+	)
 
 	if updateReq.Message.NewChatMembers != nil {
 		s.handleNewUsers(ctx, updateReq)
@@ -67,7 +86,15 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 			return s.handleBroadcast(ctx, updateReq)
 		}
 	}
-	return s.handleCrossposts(ctx, updateReq)
+	if err := s.handleCrossposts(ctx, updateReq); err != nil {
+		return err
+	}
+
+	s.Metrics.ObserveUpdatesDuration(
+		telegram.GetChatName(*updateReq.Message.Chat),
+		float64(time.Since(startTime).Seconds()),
+	)
+	return nil
 }
 
 func (s *service) checkOrigin(ctx context.Context, updateReq *telegram.Update) bool {

@@ -11,3 +11,10 @@ func GetUserName(user User) string {
 	}
 	return user.FirstName
 }
+
+func GetChatName(chat Chat) string {
+	if chat.UserName != "" {
+		return chat.UserName
+	}
+	return chat.Title
+}

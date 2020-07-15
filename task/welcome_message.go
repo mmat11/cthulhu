@@ -5,12 +5,14 @@ import (
 	"context"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"gopkg.in/yaml.v2"
 
 	"cthulhu/bot"
+	"cthulhu/metrics"
 	"cthulhu/store"
 	"cthulhu/telegram"
 )
@@ -38,11 +40,13 @@ func WelcomeMessageTask(
 	config bot.Config,
 	store store.Service,
 	tg telegram.Service,
+	metrics metrics.Service,
 	args bot.TaskArgs) func() {
 	return func() {
 		level.Info(logger).Log("msg", "running task")
 
 		var (
+			startTime                         = time.Now()
 			newUsers    UserSet               = make(UserSet)
 			taskConfigs map[string]taskConfig = make(map[string]taskConfig)
 			tpl         string
@@ -102,6 +106,11 @@ func WelcomeMessageTask(
 				level.Error(logger).Log("msg", "error while setting users processed", "err", err)
 			}
 		}
+
+		metrics.ObserveTasksDuration(
+			welcomeMessageTaskName,
+			float64(time.Since(startTime).Seconds()),
+		)
 	}
 }
 

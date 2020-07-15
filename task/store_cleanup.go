@@ -9,6 +9,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 
 	"cthulhu/bot"
+	"cthulhu/metrics"
 	"cthulhu/store"
 	"cthulhu/telegram"
 )
@@ -30,11 +31,15 @@ func StoreCleanupTask(
 	config bot.Config,
 	store store.Service,
 	tg telegram.Service,
+	metrics metrics.Service,
 	args bot.TaskArgs) func() {
 	return func() {
 		level.Info(logger).Log("msg", "running task")
 
-		var retention int = defaultRetention
+		var (
+			startTime     = time.Now()
+			retention int = defaultRetention
+		)
 
 		for _, arg := range args {
 			if arg.Arg.Name == retentionKey {
@@ -51,5 +56,10 @@ func StoreCleanupTask(
 				}
 			}
 		}
+
+		metrics.ObserveTasksDuration(
+			storeCleanupTaskName,
+			float64(time.Since(startTime).Seconds()),
+		)
 	}
 }

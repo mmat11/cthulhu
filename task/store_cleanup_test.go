@@ -54,6 +54,10 @@ func TestStoreCleanupTask(t *testing.T) {
 	)
 
 	telegramSvc := mock.NewTelegramService(ctrl)
+	metricsSvc := mock.NewMetricsService(ctrl)
+	metricsSvc.
+		EXPECT().
+		ObserveTasksDuration(gomock.Eq(storeCleanupTaskName), gomock.Any())
 
-	StoreCleanupTask(ctx, log.NewNopLogger(), bot.Config{}, storeSvc, telegramSvc, taskArgs)()
+	StoreCleanupTask(ctx, log.NewNopLogger(), bot.Config{}, storeSvc, telegramSvc, metricsSvc, taskArgs)()
 }

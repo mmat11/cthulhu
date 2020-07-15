@@ -16,21 +16,14 @@ func (s *service) handleCrossposts(ctx context.Context, updateReq *telegram.Upda
 		hashTags             map[string]struct{} = make(map[string]struct{})
 		chatID               int64               = updateReq.Message.Chat.ID
 		authorID             int                 = updateReq.Message.From.ID
-		chatName, text       string
+		chatName             string              = telegram.GetChatName(*updateReq.Message.Chat)
+		text                 string              = fmt.Sprintf("@%s >", chatName)
+		fwdText              string              = "your message has been forwarded to"
 		isCrosspost, quoting bool
-		fwdText              string = "your message has been forwarded to"
 	)
 
 	if !s.Config.isMod(authorID) {
 		return nil
-	}
-
-	if updateReq.Message.Chat.UserName != "" {
-		chatName = updateReq.Message.Chat.UserName
-		text = fmt.Sprintf("@%s >", chatName)
-	} else {
-		chatName = updateReq.Message.Chat.Title
-		text = fmt.Sprintf("%s >", chatName)
 	}
 
 	quoting = false
