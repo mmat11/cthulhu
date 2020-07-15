@@ -83,7 +83,7 @@ func main() {
 	defer level.Info(logger).Log("msg", "stop")
 
 	level.Info(logger).Log("msg", "tasks registered", "tasks", task.Registry)
-	go registerTasks(logger, config, storeService, telegramService)
+	go registerTasks(logger, config, storeService, telegramService, metricsService)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -134,7 +134,7 @@ func main() {
 	}
 }
 
-func registerTasks(logger log.Logger, cfg bot.Config, st store.Service, tg telegram.Service) {
+func registerTasks(logger log.Logger, cfg bot.Config, storeSvc store.Service, tgSvc telegram.Service, metricsSvc metrics.Service) {
 	c := cron.New()
 	for _, t := range cfg.Bot.Tasks {
 		f, ok := task.Registry[t.Task.Name]
@@ -151,8 +151,9 @@ func registerTasks(logger log.Logger, cfg bot.Config, st store.Service, tg teleg
 				context.Background(),
 				log.With(logger, "task", t.Task.Name),
 				cfg,
-				st,
-				tg,
+				storeSvc,
+				tgSvc,
+				metricsSvc,
 				t.Task.Args,
 			),
 		)
