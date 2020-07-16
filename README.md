@@ -27,7 +27,7 @@ Available commands/functions:
 
     Cthulhu will forward _message_ in all the groups in which `#tag` is part of `crosspost_tags`.
 
-4.  Admin/mod permissions with commands, configurable per group in config.yml.
+4.  Admin/mod permissions with commands, configurable per group.
 
 5.  Broadcast:
 
@@ -37,7 +37,7 @@ Available commands/functions:
 
     _message_ will be sent in all groups except the current one.
 
-Resources usage can be seen [here](http://116.203.185.109/d/rYdddlPWk/node-exporter-cthulhu?orgId=1)
+6.  Prometheus metrics exporter: https://cthulhu.live/d/vjZP1InMk/cthulhu
 
 ## Contributing
 
