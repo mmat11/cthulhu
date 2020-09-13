@@ -36,6 +36,7 @@ bot:
           admin:
             ids:
               - 797091005  # @pr0metherion
+              - 131000337  # @mmat11
             permissions:
               - ban
               - unban
