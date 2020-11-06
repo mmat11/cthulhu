@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -84,8 +85,11 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 			return s.handleUnban(ctx, updateReq)
 		case broadcastCommand:
 			return s.handleBroadcast(ctx, updateReq)
+		case counterCommand:
+			return s.handleCounter(ctx, updateReq)
 		}
 	}
+
 	if err := s.handleCrossposts(ctx, updateReq); err != nil {
 		return err
 	}
@@ -94,7 +98,8 @@ func (s *service) Update(ctx context.Context, updateReq *telegram.Update) error 
 		telegram.GetChatName(*updateReq.Message.Chat),
 		float64(time.Since(startTime).Seconds()),
 	)
-	return nil
+
+	return s.handleCustomCounters(ctx, updateReq)
 }
 
 func (s *service) checkOrigin(ctx context.Context, updateReq *telegram.Update) bool {
@@ -115,9 +120,27 @@ func (s *service) handleNewUsers(ctx context.Context, updateReq *telegram.Update
 		if g.Group.ID == chatID {
 			if g.Group.WelcomeMessage != "" {
 				for range *updateReq.Message.NewChatMembers {
-					s.Telegram.Reply(ctx, g.Group.ID, g.Group.WelcomeMessage, updateReq.Message.MessageID)
+					if err := s.Telegram.Reply(ctx, g.Group.ID, g.Group.WelcomeMessage, updateReq.Message.MessageID); err != nil {
+						level.Error(s.Logger).Log("msg", "error handling new users", "err", err)
+					}
 				}
 			}
 		}
 	}
+}
+
+func (s *service) handleCustomCounters(ctx context.Context, updateReq *telegram.Update) error {
+	counters, err := s.readCounters(ctx)
+	if err != nil {
+		level.Error(s.Logger).Log("msg", "error reading counters", "err", err)
+		return err
+	}
+
+	for counter := range counters {
+		if strings.Contains(strings.ToLower(updateReq.Message.Text), strings.ToLower(counter)) {
+			level.Info(s.Logger).Log("msg", "incrementing custom counter", "counter", counter)
+			s.Metrics.IncCustomCounter(counter)
+		}
+	}
+	return nil
 }

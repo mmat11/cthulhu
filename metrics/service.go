@@ -12,12 +12,14 @@ type Service interface {
 	IncUpdatesTotal(groupName string, userName string)
 	ObserveUpdatesDuration(groupName string, ms float64)
 	ObserveTasksDuration(taskName string, seconds float64)
+	IncCustomCounter(keyword string)
 }
 
 type metrics struct {
 	UpdatesTotal           kitmetrics.Counter
 	UpdatesDurationSeconds kitmetrics.Histogram
 	TasksDurationSeconds   kitmetrics.Histogram
+	CustomCounters         kitmetrics.Counter
 }
 
 func NewService() Service {
@@ -46,6 +48,14 @@ func NewService() Service {
 			},
 			[]string{"task"},
 		),
+		CustomCounters: kitprometheus.NewCounterFrom(
+			prometheus.CounterOpts{
+				Namespace: Namespace,
+				Name:      "custom_total",
+				Help:      "custom counters",
+			},
+			[]string{"keyword"},
+		),
 	}
 }
 
@@ -59,4 +69,8 @@ func (m *metrics) ObserveUpdatesDuration(groupName string, seconds float64) {
 
 func (m *metrics) ObserveTasksDuration(taskName string, seconds float64) {
 	m.TasksDurationSeconds.With("task", taskName).Observe(seconds)
+}
+
+func (m *metrics) IncCustomCounter(keyword string) {
+	m.CustomCounters.With("keyword", keyword).Add(1)
 }

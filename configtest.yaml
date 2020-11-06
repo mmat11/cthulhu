@@ -1,6 +1,6 @@
 bot:
   database:
-    type: badger  # alternatives: inmemory
+    type: inmemory  # alternatives: inmemory
   access_control:
     mods:
       ids:
